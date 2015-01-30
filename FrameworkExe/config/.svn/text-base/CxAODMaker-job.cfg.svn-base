@@ -1,0 +1,11 @@
+# This is a ConfigStore file, please see ConfigStore.cxx for info.
+
+bool debug                    = false
+
+string muonContainer          = Muons
+string electronContainer      = ElectronCollection
+string jetContainer           = AntiKt4EMTopoJets
+string jetAlgoName            = AntiKt4TopoEM
+string fatJetContainer        = CamKt12LCTopoJets
+string METContainer           = MET_RefFinal
+string truthParticleContainer = TruthParticle

@@ -1,0 +1,11 @@
+
+# this is a env style config file
+
+maxEvents		-1
+
+TupleMaker.MuonsIn		Muons
+TupleMaker.ElectronsIn	ElectronCollection
+TupleMaker.JetsIn 	AntiKt4EMTopoJets
+TupleMaker.Label        mytest
+
+debug			false

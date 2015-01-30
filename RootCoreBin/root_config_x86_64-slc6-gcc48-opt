@@ -1,0 +1,10 @@
+ROOTSYS = /cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase/x86_64/root/5.34.22-x86_64-slc6-gcc48-opt
+PLATFORM = linux
+CXX = c++
+CXXFLAGS = -O2 -Wall -fPIC -pthread -std=c++11 -Wno-deprecated-declarations -m64 -I/cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase/x86_64/root/5.34.22-x86_64-slc6-gcc48-opt/include
+CXXFLAGS_NOOPT = -Wall -fPIC -pthread -std=c++11 -Wno-deprecated-declarations -m64 -I/cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase/x86_64/root/5.34.22-x86_64-slc6-gcc48-opt/include
+SOFLAGS = -shared
+LD = c++
+LDFLAGS = -m64
+ROOTLIBS = -L/cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase/x86_64/root/5.34.22-x86_64-slc6-gcc48-opt/lib -lCore -lCint -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -pthread -lm -ldl -rdynamic
+ROOT_VERSION = ROOT 5.34/22 (v5-34-22@v5-34-22, Oct 10 2014, 15:39:08 on linuxx8664gcc)

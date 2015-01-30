@@ -1,0 +1,194 @@
+// Dear emacs, this is -*-c++-*-
+
+template < typename IntProps, typename FloatProps >
+template <class T>
+void ObjectDecorator<IntProps, FloatProps>::setAuxValue(
+        T value,
+        const SG::AuxElement* object_const,
+        SG::AuxElement::Decorator<T>& deco,
+        SG::AuxElement::Accessor<T>& acce,
+        std::string &name) {
+
+  if (!acce.isAvailable(*object_const)) {
+    // property not available
+    // -> attach with decorator
+    deco(*object_const) = value;
+    return;
+  }
+
+  // check if the aux container is const
+  bool isConst = (object_const->container()->getStore() == 0);
+  
+  // we need a non-const object for isAvailableWritable
+  SG::AuxElement* object = const_cast<SG::AuxElement*>(object_const);
+  
+  // the following Accessor call is necessary in case of
+  // a SC to make it point to the object in the SC
+  // instead of the original object for isAvailableWritable
+  if (isConst) {
+    // container is const
+    // -> have to call on const object to avoid error
+    acce(*object_const);
+  } else {
+    // container is non-const 
+    // -> we can call on non-const object
+    // this is needed for SCs on non-const output containers,
+    // otherwise isAvailableWriteable returns false (not sure why)
+    acce(*object);
+  }
+  
+  if (acce.isAvailableWritable(*object)) {
+    // we have a non-const container
+    // -> overwrite using Accessor
+    acce(*object) = value;
+    return;
+  } 
+
+  if (deco.isAvailableWritable(*object)) {
+    // we have a const container, but this property was decorated
+    // -> overwrite using Decorator
+    deco(*object) = value;
+    return;
+  }
+
+  // we have a const container and this property was not decorated
+  // -> throw error
+  Error("ObjectDecorator::setAuxValue()",
+          ("You are trying to modify the existing property '" + name + "' of a const object.").c_str());
+  exit(EXIT_FAILURE);
+}
+
+template < typename IntProps, typename FloatProps >
+template <class T>
+T ObjectDecorator<IntProps, FloatProps>::getAuxValue(
+    const SG::AuxElement* object,
+    SG::AuxElement::Accessor<T>& acce,
+    std::string &name) {
+  if (acce.isAvailable(*object)) {
+    return acce(*object);
+  }
+  Error("ObjectDecorator::getAuxValue()", ("Accessor '" + name + "' not available.").c_str());
+  exit(EXIT_FAILURE);
+  return T();
+}
+
+template < typename IntProps, typename FloatProps >
+template <class T>
+bool ObjectDecorator<IntProps, FloatProps>::getAuxValue(
+    const SG::AuxElement* object,
+    SG::AuxElement::Accessor<T>& acce,
+    T &value,
+    std::string& ) {
+  if (acce.isAvailable(*object)) {
+    value = acce(*object);
+    return true;
+  }
+  return false;
+}
+
+template < typename IntProps, typename FloatProps >
+template <class T>
+bool ObjectDecorator<IntProps, FloatProps>::existsAuxValue(
+    const SG::AuxElement* object,
+    SG::AuxElement::Accessor<T>& acce) {
+  return acce.isAvailable(*object);
+}
+
+template < typename IntProps, typename FloatProps >
+SG::AuxElement::Decorator<int>& ObjectDecorator<IntProps, FloatProps>::dec(IntProps p) {
+  auto pos = m_intDecs.find(p);
+  if(pos == m_intDecs.end()) {
+    m_intDecs.emplace(p, SG::AuxElement::Decorator<int>(m_intPropNames.at(p)));
+    pos = m_intDecs.find(p);
+  }
+  return pos->second;
+}
+
+template < typename IntProps, typename FloatProps >
+SG::AuxElement::Decorator<float>& ObjectDecorator<IntProps, FloatProps>::dec(FloatProps p) {
+  auto pos = m_floatDecs.find(p);
+  if(pos == m_floatDecs.end()) {
+    m_floatDecs.emplace(p, SG::AuxElement::Decorator<float>(m_floatPropNames.at(p)));
+    pos = m_floatDecs.find(p);
+  }
+  return pos->second;
+}
+
+template < typename IntProps, typename FloatProps >
+SG::AuxElement::Accessor<int>& ObjectDecorator<IntProps, FloatProps>::acc(IntProps p) {
+  auto pos = m_intAccs.find(p);
+  if(pos == m_intAccs.end()) {
+    m_intAccs.emplace(p, SG::AuxElement::Accessor<int>(m_intPropNames.at(p)));
+    pos = m_intAccs.find(p);
+  }
+  return pos->second;
+}
+
+template < typename IntProps, typename FloatProps >
+SG::AuxElement::Accessor<float>& ObjectDecorator<IntProps, FloatProps>::acc(FloatProps p) {
+  auto pos = m_floatAccs.find(p);
+  if(pos == m_floatAccs.end()) {
+    m_floatAccs.emplace(p, SG::AuxElement::Accessor<float>(m_floatPropNames.at(p)));
+    pos = m_floatAccs.find(p);
+  }
+  return pos->second;
+}
+
+
+template < typename IntProps, typename FloatProps >
+int ObjectDecorator<IntProps, FloatProps>::get(const SG::AuxElement* particle, IntProps p) {
+  return getAuxValue<int>(particle, acc(p), m_intPropNames.at(p));
+}
+
+template < typename IntProps, typename FloatProps >
+float ObjectDecorator<IntProps, FloatProps>::get(const SG::AuxElement* particle, FloatProps p) {
+  return getAuxValue<float>(particle, acc(p), m_floatPropNames.at(p));
+}
+
+template < typename IntProps, typename FloatProps >
+bool ObjectDecorator<IntProps, FloatProps>::get(const SG::AuxElement* particle, IntProps p,
+                                                int& value) {
+  return getAuxValue<int>(particle, acc(p), value, m_intPropNames.at(p));
+}
+
+template < typename IntProps, typename FloatProps >
+bool ObjectDecorator<IntProps, FloatProps>::get(const SG::AuxElement* particle, FloatProps p,
+                                                float& value) {
+  return getAuxValue<float>(particle, acc(p), value, m_floatPropNames.at(p));
+}
+
+template < typename IntProps, typename FloatProps >
+bool ObjectDecorator<IntProps, FloatProps>::exists(const SG::AuxElement* particle,
+                                                   IntProps p) {
+  return existsAuxValue<int>(particle, acc(p));
+}
+
+template < typename IntProps, typename FloatProps >
+bool ObjectDecorator<IntProps, FloatProps>::exists(const SG::AuxElement* particle,
+                                                   FloatProps p) {
+  return existsAuxValue<float>(particle, acc(p));
+}
+
+template < typename IntProps, typename FloatProps >
+void ObjectDecorator<IntProps, FloatProps>::set(const SG::AuxElement* particle, IntProps p, int value) {
+  setAuxValue(value, particle, dec(p), acc(p), m_intPropNames.at(p));
+}
+
+template < typename IntProps, typename FloatProps >
+void ObjectDecorator<IntProps, FloatProps>::set(const SG::AuxElement* particle, FloatProps p, float value) {
+  setAuxValue(value, particle, dec(p), acc(p), m_floatPropNames.at(p));
+}
+
+template < typename IntProps, typename FloatProps >
+void ObjectDecorator<IntProps, FloatProps>::copy(const SG::AuxElement* pIn, SG::AuxElement* pOut,
+                                                 IntProps p) {
+  set(pOut, p, get(pIn, p));
+}
+
+template < typename IntProps, typename FloatProps >
+void ObjectDecorator<IntProps, FloatProps>::copy(const SG::AuxElement* pIn, SG::AuxElement* pOut,
+                                                 FloatProps p) {
+  set(pOut, p, get(pIn, p));
+}
+
+

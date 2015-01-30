@@ -1,0 +1,77 @@
+10
+
+dir
+226116
+svn+ssh://svn.cern.ch/reps/atlasphys/Physics/Higgs/HSG5/software/VHAnalysis/LHCRun2/CxAODFramework/TupleReader/tags/TupleReader-00-00-04
+svn+ssh://svn.cern.ch/reps/atlasphys
+
+
+
+2014-12-18T16:43:29.337843Z
+221488
+haysjm
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+883ba7d9-fdd0-4202-9341-49aa55999ad8
+
+Root
+dir
+
+cmt
+dir
+
+scripts
+dir
+
+src
+dir
+
+README.txt
+file
+
+
+
+
+2015-01-21T20:20:22.000000Z
+a23c3eb1efae34cd74c82bef60eca022
+2014-10-06T13:02:47.843772Z
+204034
+haysjm
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+389
+
+TupleReader
+dir
+

@@ -1,0 +1,285 @@
+#include "xAODEgamma/Electron.h"
+#include "xAODMuon/Muon.h"
+#include "xAODJet/Jet.h"
+#include "xAODEventInfo/EventInfo.h"
+//
+#include <utility>
+
+static bool sort_pt(const xAOD::Jet* jetA, const xAOD::Jet* jetB) {
+  return jetA->pt() > jetB->pt();
+}
+
+
+
+template<typename T>
+VHbbEvtSelection<T>::VHbbEvtSelection() noexcept :
+EventSelection(),
+  m_result()
+{}
+
+template<typename T>
+bool VHbbEvtSelection<T>::passFatJetSelection(const xAOD::JetContainer* jets) {
+  m_result.jets.clear();
+
+  //really basic fat jet mass cut
+  for (unsigned int iJet(0) ; iJet < jets->size(); ++iJet) {
+    const xAOD::Jet * jet = jets->at(iJet);
+    if (m_decorator.get(jet,FatJetIntProps::isFatJet)){
+      if (jet->m() > 50000.){
+        return true;
+      }
+      
+    }
+
+  }
+  return false;
+}
+
+// to be implemented here
+template<typename T>
+bool VHbbEvtSelection<T>::passJetSelection(const xAOD::JetContainer* jets) {
+  // assume that T has a field vector<Jet*> jets
+  m_result.jets.clear();
+  // look at signal jets, veto jets
+  // if pass VH jets selection fill T.jets and return true
+  // fill T.jets in decreasing pT order
+  // else return false
+
+  // Similar to pre-selection but explicit one jet cuts to mimic derivation (>100 GeV)
+  int njets(0);
+  bool hasHighPtJet(false);
+  for (unsigned int iJet(0) ; iJet < jets->size(); ++iJet) {
+    const xAOD::Jet * jet = jets->at(iJet);
+    if (!m_decorator.get(jet,JetIntProps::passOR)) continue; 
+    if (m_decorator.get(jet,JetIntProps::isVetoJet)) { // applied to keep CxAOD jets already
+      if (m_decorator.get(jet,JetIntProps::isSignalJet)) { // pt>20 GeV, |eta|<2.5
+        njets++;
+        if (jet->pt() > 100000.)
+          hasHighPtJet=true;
+      }
+      m_result.jets.push_back(jet);
+    }
+  }
+  // Jets appear to be pt ordered but just in case
+  std::sort(m_result.jets.begin(), m_result.jets.end(), sort_pt);
+
+  // take >1 jet and 1 jet events with jetpt>100 GeV
+  return (njets>1 || (njets==1&&hasHighPtJet)) ? true : false;
+
+}
+
+// to be implemented here
+template<typename T>
+int VHbbEvtSelection<T>::doVHLeptonSelection(const xAOD::ElectronContainer* electrons,
+                                             const xAOD::MuonContainer* muons,
+                                             const xAOD::Electron*& el1, const xAOD::Electron*& el2,
+                                             const xAOD::Muon*& mu1, const xAOD::Muon*& mu2) {
+  // one function for lepton selection to ensure consistency between 0/1/2 lepton channels
+  // try to write it so that if one changes some cut for some channel, the other channels cannot become
+  // overlapping/inconsistent
+
+  // if no loose lepton, set el1, el2, mu1, mu2 to nullptr and return 0
+  // if 1 tight 0 loose, set el1 or mu1 to the tight lepton, el2 and mu2 to nullptr
+  // and return 1
+  // if 1 medium + 1 loose, set el1 and el2 or mu1 and mu2 to the leptons, set the others to
+  // nullptr, and return 2
+
+  //  This is the same as the Lepton pre-selection for the time-being
+  return doVHLeptonPreSelection(electrons, muons, el1, el2, mu1, mu2);
+
+}
+
+template<typename T>
+bool VHbbEvtSelection<T>::passSelection(const xAOD::EventInfo* evtinfo,
+                                        const xAOD::MissingET* met,
+                                        const xAOD::ElectronContainer* electrons,
+                               	        const xAOD::MuonContainer* muons,
+                                        const xAOD::JetContainer* jets) {
+
+  // assume that T has a field bool pass
+  clearResult();
+  if(! passLeptonSelection(electrons, muons, met)) {
+    m_result.pass = false;
+    return false;
+  }
+  if(! passJetSelection(jets)) {
+    m_result.pass = false;
+    return false;
+  }
+  if(! passKinematics()) {
+    m_result.pass = false;
+    return false;
+  }
+  m_result.pass = true;
+  return true;
+
+}
+
+// Pre-selection versions
+template<typename T>
+bool VHbbEvtSelection<T>::passFatJetPreSelection(const xAOD::JetContainer* jets) {
+
+  m_result.jets.clear();
+
+  for (unsigned int iJet(0) ; iJet < jets->size(); ++iJet) {
+    const xAOD::Jet * jet = jets->at(iJet);
+    //any event with a  fat jet that passes cuts gets kept
+    //maybe only test the leading jet?
+    if (m_decorator.get(jet,FatJetIntProps::isFatJet)) return true; 
+  }
+  return false;
+
+
+}
+
+// Pre-selection versions
+template<typename T>
+bool VHbbEvtSelection<T>::passJetPreSelection(const xAOD::JetContainer* jets) {
+  // assume that T has a field vector<Jet*> jets
+  m_result.jets.clear();
+  // look at signal jets, veto jets
+  // if pass VH jets selection fill T.jets and return true
+  // fill T.jets in decreasing pT order
+  // else return false
+  int njets(0);
+  for (unsigned int iJet(0) ; iJet < jets->size(); ++iJet) {
+    const xAOD::Jet * jet = jets->at(iJet);
+    if (!m_decorator.get(jet,JetIntProps::passOR)) continue; 
+    if (m_decorator.get(jet,JetIntProps::isVetoJet)) { // applied to keep CxAOD jets already
+      if (m_decorator.get(jet,JetIntProps::isSignalJet)) // pt>20 GeV, |eta|<2.5
+        njets++;
+      m_result.jets.push_back(jet);
+    }
+  }
+  // Jets appear to be pt ordered but just in case
+  std::sort(m_result.jets.begin(), m_result.jets.end(), sort_pt);
+
+  // take >=1 jet. Only some 1 signal jet events(jetpt>100 GeV) are saved in the derivations.
+  return (njets>=1) ? true : false;
+
+}
+
+template<typename T>
+int VHbbEvtSelection<T>::doVHLeptonPreSelection(const xAOD::ElectronContainer* electrons,
+                                                const xAOD::MuonContainer* muons,
+                                                const xAOD::Electron*& el1, const xAOD::Electron*& el2,
+                                                const xAOD::Muon*& mu1, const xAOD::Muon*& mu2) {
+  // one function for lepton selection to ensure consistency between 0/1/2 lepton channels
+  // try to write it so that if one changes some cut for some channel, the other channels cannot become
+  // overlapping/inconsistent
+
+  // if no loose lepton, set el1, el2, mu1, mu2 to nullptr and return 0
+  // if 1 tight 0 loose, set el1 or mu1 to the tight lepton, el2 and mu2 to nullptr
+  // and return 1
+  // if 1 medium + 1 loose, set el1 and el2 or mu1 and mu2 to the leptons, set the others to
+  // nullptr, and return 2
+  // else, return -1
+
+
+  //
+  el1=nullptr;
+  el2=nullptr;
+  mu1=nullptr;
+  mu2=nullptr;
+  int nelecs=0;
+  int nmuons=0;
+  int nelecsSigZH=0;
+  int nmuonsSigZH=0;
+  int nelecsSigWH=0;
+  int nmuonsSigWH=0;
+  for (unsigned int iElec = 0; iElec < electrons->size(); ++iElec) {
+    const xAOD::Electron * elec = electrons->at(iElec);
+    if (!m_decorator.get(elec,ElecIntProps::passOR)) continue;
+    if (m_decorator.get(elec,ElecIntProps::isVHLooseElectron)) {
+      nelecs++;
+      if (el1==0)
+        el1=elec;
+      else if (el2==0)
+        el2=elec;
+    }
+    if (m_decorator.get(elec,ElecIntProps::isZHSignalElectron)) nelecsSigZH++;
+    if (m_decorator.get(elec,ElecIntProps::isWHSignalElectron)) nelecsSigWH++;
+  }
+
+  for (unsigned int iMuon = 0; iMuon < muons->size(); ++iMuon) {
+    const xAOD::Muon * muon = muons->at(iMuon);
+    if (!m_decorator.get(muon,MuonIntProps::passOR)) continue;
+    if (m_decorator.get(muon,MuonIntProps::isVHLooseMuon)) {
+      nmuons++;
+      if (mu1==0)
+        mu1=muon;
+      else if (mu2==0)
+        mu2=muon;
+    }
+    if (m_decorator.get(muon,MuonIntProps::isZHSignalMuon)) nmuonsSigZH++;
+    if (m_decorator.get(muon,MuonIntProps::isWHSignalMuon)) nmuonsSigWH++;
+  }
+
+  if (nelecs+nmuons == 0)
+    return 0;
+  else if (nelecs+nmuons==1 && nelecsSigWH+nmuonsSigWH ==1)
+    return 1;
+  else if (nelecs+nmuons==2 && nelecsSigZH+nmuonsSigZH >=1) {
+    if (mu1&&mu2&&mu1->pt() < mu2->pt()) {
+      std::swap(mu1, mu2);
+    }
+    if (el1&&el2&&el1->pt() < el2->pt()) {
+      std::swap(el1, el2);
+    }
+
+    return 2;
+  }
+
+  return -1;
+
+}
+
+template<typename T>
+bool VHbbEvtSelection<T>::passPreSelection(const xAOD::EventInfo* evtinfo,
+                                           const xAOD::MissingET* met,
+                                           const xAOD::ElectronContainer* electrons,
+                       			   const xAOD::MuonContainer* muons,
+                                           const xAOD::JetContainer* jets,
+                                           const xAOD::JetContainer* fatjets) {
+  // assume that T has a field bool pass
+  clearResult();
+
+  // event cleaning
+  bool passEventCleaning = true;
+  bool isMC = m_decorator.get(evtinfo, EventInfoIntProps::isMC);
+  passEventCleaning &= m_decorator.get(evtinfo, EventInfoIntProps::hasPV);
+  if (!isMC) {
+    passEventCleaning &= m_decorator.get(evtinfo, EventInfoIntProps::passGRL);
+    passEventCleaning &= m_decorator.get(evtinfo, EventInfoIntProps::isCleanEvent);
+  }
+  
+  // leptons
+  if(! passLeptonPreSelection(electrons, muons, met)) {
+    m_result.pass = false;
+    return false;
+  }
+  
+  // jets
+  if(! passJetPreSelection(jets) && ! passFatJetPreSelection(fatjets)) {
+      m_result.pass = false;
+      return false;
+  }
+  // Trigger to be implemented
+  // if(! passTriggerPreSelection()) {
+  //  m_result.pass = false;
+  //  return false;
+  //  }
+  m_result.pass = true;
+  return true;
+
+}
+
+//
+template<typename T>
+bool VHbbEvtSelection<T>::passKinematics() {
+  return true;
+}
+
+template<typename T>
+void VHbbEvtSelection<T>::clearResult() {
+}

@@ -1,0 +1,11 @@
+# change user name
+sed -i 's/user.%nickname%/group.phys-higgs/g' FrameworkExe/util/hsg5frameworkTuple.cxx
+# use proper options
+sed -i 's/output job name/output job name\n    driver.options()->setString(EL::Job::optSubmitFlags, "--official");/g' FrameworkExe/util/hsg5frameworkTuple.cxx
+# compile
+rc compile
+#############
+# IMPORTANT #
+#############
+# use this setup now :
+#  voms-proxy-init -voms atlas:/atlas/phys-higgs/Role=production

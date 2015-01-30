@@ -1,0 +1,13 @@
+# This is a ConfigStore file, please see ConfigStore.cxx for info.
+
+string TupleMaker.PhotonsIn       = PhotonCollection
+string TupleMaker.MuonsIn         = Muons
+string TupleMaker.ElectronsIn     = ElectronCollection
+string TupleMaker.JetsIn          = AntiKt4EMTopoJets
+string TupleMaker.FatJetsIn       = CamKt12LCTopoJets
+string TupleMaker.MetIn           = MET_RefFinal
+string TupleMaker.Label           = tuple
+
+vector<string> TupleMaker.Variations = Original Nominal
+string         TupleMaker.VariationMode = block
+bool           TupleMaker.UseEventInfo = true

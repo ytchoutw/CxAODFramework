@@ -1,0 +1,6 @@
+# change user name
+sed -i 's/group.phys-higgs/user.%nickname%/g' FrameworkExe/util/hsg5frameworkTuple.cxx
+# use proper options
+sed -i '/--official/d' FrameworkExe/util/hsg5frameworkTuple.cxx
+# compile
+rc compile

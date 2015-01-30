@@ -1,0 +1,342 @@
+// Dear emacs, this is -*-c++-*-
+
+template <class partType, class partContainer> 
+ObjectHandler<partType,partContainer>::ObjectHandler(const std::string& name, ConfigStore & config,
+                                                     xAOD::TEvent * event, EventInfoHandler & eventInfoHandler) :
+  m_handlerName(name),
+  m_config(config),
+  m_eventInfoHandler(eventInfoHandler),
+  m_event(event),
+  m_TStore(ObjectHandler_Helper::createTStore()),
+  m_containerName("none"), // TODO: initialize this properly
+  m_indexDecorator(),
+  m_createElementLinks(true),
+  m_storeOrig(false),
+  m_usedInOR(false)
+{
+
+  // set containerName
+  m_config.getif<std::string>(name+"Container",m_containerName);
+
+  // set flag store original (non-calibrated) container
+  m_config.getif<bool>("storeOriginal",m_storeOrig);
+
+  // add empty systematic (Nominal) by default
+  m_sysList.push_back(CP::SystematicSet());
+}
+
+
+template <class partType, class partContainer> 
+ObjectHandler<partType,partContainer>::~ObjectHandler() 
+{
+ 
+}
+
+template <class partType, class partContainer> 
+EL::StatusCode ObjectHandler<partType,partContainer>::addCPVariations(const std::vector<TString> &variations) {
+  
+  for (TString name : variations) {
+    CP::SystematicVariation sysVar = CP::SystematicVariation(name.Data());
+    bool anyAffected = false;
+    for (CP::ISystematicsTool* tool : m_sysToolList) {
+      anyAffected |= tool->isAffectedBySystematic(sysVar);
+    }
+    if (anyAffected) {
+      // TODO check for duplicates?
+      m_sysList.push_back(CP::SystematicSet());
+      m_sysList.back().insert(sysVar);
+    }
+  }
+  return EL::StatusCode::SUCCESS;
+}
+
+
+template <class partType, class partContainer> 
+EL::StatusCode ObjectHandler<partType,partContainer>::setObjects() 
+{
+
+
+  //retrieve input object container
+  //--------------------------------
+  const partContainer * constParticles;
+  if (!m_event->retrieve(constParticles, m_containerName).isSuccess()) {
+    Error("ObjectHandler::setObjects()", ("Failed to retrieve particle container '" + m_containerName + "'").c_str());
+    return EL::StatusCode::FAILURE;
+  }
+  // clear containers
+  m_inContainer.clear();
+  m_outContainer.clear();
+
+  // create shallow copies for all systematic variations including "Nominal" and "Original"
+  // --------------------------------------------------------------------------------------
+  // make list of containers
+  std::vector<TString> listOfContainers;
+  for (CP::SystematicSet sysSet : m_sysList) {
+    TString sysName = sysSet.name();
+    if (sysName == "") sysName = "Nominal";
+    listOfContainers.push_back(sysName);
+  }
+  if ( m_storeOrig ) listOfContainers.push_back("Original");
+  // record containers in TEvent
+  for (const TString & contName : listOfContainers) {
+    
+    std::pair<partContainer*, xAOD::ShallowAuxContainer *> shallowCopyCont = xAOD::shallowCopyContainer(*constParticles);
+    m_inContainer[contName] = shallowCopyCont.first;
+
+    //Need this for MET which relies on element links
+    if (m_createElementLinks) {
+      xAOD::setOriginalObjectLink(*constParticles,*(shallowCopyCont.first));
+    }
+    
+  }
+    
+  return EL::StatusCode::SUCCESS;
+
+}
+
+template <class partType, class partContainer> 
+partContainer* ObjectHandler<partType,partContainer>::getParticleVariation(
+          std::map<TString, partContainer *> &container,
+          const TString &variation)
+{
+    if (container.count(variation)) {
+      return container[variation];
+    }
+    if (container.count("Nominal")) {
+      return container["Nominal"];
+    }
+    return nullptr;
+}
+
+template <class partType, class partContainer> 
+EL::StatusCode ObjectHandler<partType,partContainer>::calibrate() 
+{
+
+  // TODO wrap systematic set + container into struct
+  for (CP::SystematicSet sysSet : m_sysList) {
+    TString sysName = sysSet.name();
+    if (sysName == "") sysName = "Nominal";
+    if (calibrateCopies(m_inContainer[sysName], sysSet) != EL::StatusCode::SUCCESS) {
+      Error("ObjectHandler::calibrate()", "Could not successfully calibrate shallow copies for variation '" + sysName + "'!");
+      return EL::StatusCode::FAILURE;
+    }
+  }
+  
+  // set four momentum and add decorations for original (non-calibrated) container
+  if ( m_storeOrig ) {
+    partContainer * container = m_inContainer["Original"];
+    
+    if ( ! container ) {
+      Error("calibrate()","Couldn't find Original container among input containers!");
+      return EL::StatusCode::FAILURE;
+    }
+    for (partType * part : *(container)) {
+      setP4( part , part );
+      decorate( part );
+    }
+  }
+  
+  return EL::StatusCode::SUCCESS;
+
+}
+
+
+template <class partType, class partContainer> 
+bool ObjectHandler<partType,partContainer>::passAny(std::map<TString, partContainer *> partContList,
+						    int index,
+						    bool (*passFunction)(partType *))
+{
+
+  bool passAny = false;
+  for (std::pair<TString,partContainer*> particles : partContList) {
+    passAny |= passFunction(particles.second->at(index));
+  }
+
+  return passAny;
+
+}
+
+
+template <class partType, class partContainer> 
+void ObjectHandler<partType,partContainer>::copyContainer(std::map<TString, partContainer *> partContList, 
+							  partContainer * outPartCont, 
+							  TString sysName, 
+							  bool (*checkSel)(partType *)) 
+{
+
+  // TODO: avoid string
+  bool isSysVar = (sysName != "Nominal");
+
+  // TODO check for availability?
+  unsigned int nParticles = 0;
+  if(partContList.size() > 0) nParticles = (*partContList.begin()).second->size();
+
+  // TODO w/o counter?
+  int countOutParticles = 0;
+  for (unsigned int partIndex = 0; partIndex < nParticles; partIndex++) {
+
+    // check if particle passed the selection for any variation (nominal or systematic)
+    bool passAnyVar = passAny( partContList, partIndex, checkSel);
+
+    if (passAnyVar) {
+
+      // TODO avoid string
+      partType * inParticle = partContList[sysName]->at(partIndex);
+
+      partType * outParticle = 0;
+      if (!isSysVar) {
+	// new particle for nominal
+        outParticle = new partType();
+        outPartCont->push_back(outParticle);
+      } else {
+	// particle exists already for shallow copies
+	outParticle = outPartCont->at(countOutParticles);
+      }
+
+      //here it is decided which variables will be written to the output
+      if(setVariables(inParticle,outParticle,isSysVar) != EL::StatusCode::SUCCESS){
+	Error("ObjectHandler<partType,partContainer>::copyContainer","Failed to set output variables!");
+      }
+
+      // add particle indices to output
+      if (!isSysVar) {
+        //m_indexDecorator.setPartIndex(outParticle,m_indexDecorator.getPartIndex(inParticle));
+        m_indexDecorator.set(outParticle, IndexIntProps::partIndex, partIndex);
+      }
+      
+      countOutParticles++;
+    }
+  }
+}
+
+
+template <class partType, class partContainer> 
+EL::StatusCode ObjectHandler<partType, partContainer>::fillOutputContainerCheck(
+    bool (*checkSel)(partType *)) 
+{
+
+  // fill all nominal and syst particles that pass selection
+  //-------------------------------------------------------------------------------
+
+  // fill nominal container
+  partContainer * outContainerNominal = new partContainer();
+  xAOD::AuxContainerBase * outContainerNominalAux = new xAOD::AuxContainerBase();
+  outContainerNominal->setStore(outContainerNominalAux);
+
+  copyContainer(m_inContainer, outContainerNominal, "Nominal", checkSel);
+  // add container to output objects
+  m_outContainer["Nominal"] = outContainerNominal;
+
+  //necessary even if we do not want to write an xAOD!
+  //because otherwise we cannot create shallow copies in the following
+  //using a TStore for this purpose does not work currently (?)
+  if ( ! m_event->record(outContainerNominal, m_containerName + "___Nominal") ) {
+    return EL::StatusCode::FAILURE;
+  }
+  if ( ! m_event->record(outContainerNominalAux, m_containerName + "___NominalAux.") ) {
+    return EL::StatusCode::FAILURE;
+  }
+  
+  // create shallow copies for each syst variation + Original
+  //---------------------------------------------------------
+  // make list of containers
+  std::vector<TString> listOfContainers;
+  for (CP::SystematicSet sysSet : m_sysList) {
+    TString sysName = sysSet.name();
+    if (sysName == "") continue; // nominal already treated above
+    listOfContainers.push_back(sysName);
+  }
+  if ( m_storeOrig ) listOfContainers.push_back("Original");
+  // record containers in TEvent
+  for (const TString & contName : listOfContainers) {
+
+    std::pair<partContainer *, xAOD::ShallowAuxContainer *> outContainerSC = xAOD::shallowCopyContainer(*outContainerNominal);
+
+    copyContainer(m_inContainer, outContainerSC.first, contName, checkSel);
+    // add container to output objects
+    m_outContainer[contName] = outContainerSC.first;
+
+    //only necessary if we want to write an output xAOD
+    if ( ! m_event->record(outContainerSC.first, m_containerName + "___" + contName.Data()) ) {
+      return EL::StatusCode::FAILURE;
+    }
+    if ( ! m_event->record(outContainerSC.second, m_containerName + "___" + contName.Data() + "Aux.") ) {
+      return EL::StatusCode::FAILURE;
+    }
+  }
+
+  return EL::StatusCode::SUCCESS;
+
+}
+
+
+template <class partType, class partContainer> 
+void ObjectHandler<partType,partContainer>::printParticle(partType * particle) 
+{
+
+  std::cout << "particle->pt()  " << particle->pt() << std::endl;
+  std::cout << "particle->eta() " << particle->eta() << std::endl;
+  std::cout << "particle->phi() " << particle->phi() << std::endl;
+  std::cout << "particle->e()   " << particle->e() << std::endl;
+  std::cout << "particle->m()   " << particle->m() << std::endl;
+
+}
+
+template <class partType, class partContainer> 
+EL::StatusCode ObjectHandler<partType,partContainer>::clearEvent() {
+
+  for (std::pair<TString, partContainer *> particleSet : m_inContainer) {
+
+    //first delete the pointer to the Aux container associated to the object container 
+    delete particleSet.second->getConstStore();
+    particleSet.second->setConstStore(0);
+    //delete the pointer to the object container
+    delete particleSet.second;
+    particleSet.second = 0;
+
+  }
+  return EL::StatusCode::SUCCESS;
+}
+
+template <class partType, class partContainer> 
+EL::StatusCode ObjectHandler<partType,partContainer>::counter(int mode) 
+{
+  // count the size of the input and output containers
+  // mode 0/1 fill/print
+
+  // fill counters
+  if (mode==0) {
+    // systematics
+    for (CP::SystematicSet sysSet : m_sysList) {
+      TString sysName = sysSet.name();
+      if (sysName == "") sysName = "Nominal";
+      partContainer * container = m_inContainer[sysName];
+      if ( ! container ) {
+	Error("counter()","Couldn't find container among input containers!");
+	return EL::StatusCode::FAILURE;
+      }
+      m_countCont[sysName]+=container->size();
+      //      std::cout << "sysname " << sysName << " arry " << container->size() << std::endl;
+    }
+  
+    // originals
+    if ( m_storeOrig ) {
+      partContainer * container = m_inContainer["Original"];
+      if ( ! container ) {
+	Error("counter()","Couldn't find Original container among input containers!");
+	return EL::StatusCode::FAILURE;
+      }
+      m_countCont["Original"]+=container->size();	
+    }
+  } else if(mode==1) {
+    // print
+    std::cout << "Handler: input Container name:: " << m_containerName  << std::endl;
+    std::cout << "ArrayName/size"   << std::endl;
+    for (auto const &it1 : m_countCont) {
+      std::cout << it1.first << " " << it1.second << std::endl;
+    }
+
+  }
+  return EL::StatusCode::SUCCESS;
+
+}

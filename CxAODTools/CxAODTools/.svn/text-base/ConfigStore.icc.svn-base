@@ -1,0 +1,135 @@
+#ifndef CxAODTools_ConfigStore_ICC
+#define CxAODTools_ConfigStore_ICC
+
+// STL includes
+#include <string>
+#include <sstream>
+#include <map>
+
+// Analysis includes
+#include "CxAODTools/ConfigFieldBase.h"
+#include "CxAODTools/ConfigField.h"
+
+// ROOT includes
+#include "TError.h"
+
+
+template <class T> 
+const T& ConfigStore::get(const std::string& key) const
+{
+  
+  std::map<std::string,ConfigFieldBase*>::const_iterator it = m_data.find(key);
+   
+  if ( it == m_data.end() ) {
+    Error("ConfigStore::get()","field with name %s doesn't exist!",key.c_str());
+    throw 0;
+  }
+  
+  ConfigField<T>* field = dynamic_cast<ConfigField<T>*>(it->second);    
+  if ( field == 0 ) {
+    Error("ConfigStore::get()","field with name %s doesn't have correct type!",key.c_str());
+    throw 0;
+  }
+  
+  return field->get();
+
+}
+
+
+template <class T> 
+void ConfigStore::getif(const std::string& key, T& value) const
+{
+  
+  std::map<std::string,ConfigFieldBase*>::const_iterator it = m_data.find(key);
+   
+  if ( it != m_data.end() ) {
+    
+    ConfigField<T>* field = dynamic_cast<ConfigField<T>*>(it->second);    
+    if ( field == 0 ) {
+      Error("ConfigStore::getif()","field with name %s doesn't have correct type!",key.c_str());
+      throw 0;
+    }
+    else value = field->get();
+  
+  }
+
+}
+
+
+template <class T> 
+void ConfigStore::put(const std::string& key, const T& value, const bool& overwrite) 
+{
+
+  std::map<std::string,ConfigFieldBase*>::iterator it = m_data.find(key);
+  
+  if ( it != m_data.end() ) {
+    if ( ! overwrite ) {
+      Error("ConfigStore::put()","field with name %s doesn't exist!",key.c_str());
+      throw 0;
+    } 
+    else {
+      delete it->second; 
+      it->second = 0;
+    }
+  }
+  
+  ConfigField<T>* field = new ConfigField<T>(value);
+  m_data[key] = field;
+
+}
+
+
+template <class T>
+T ConfigStore::convertField(const std::string& value) 
+{
+  
+  std::istringstream iss(value);
+  T object;
+  
+  iss >> std::ws >> object >> std::ws;
+  
+  if ( ! iss.eof() ) {
+    Error("ConfigStore::convertField()","could convert '%s'",value.c_str());
+    throw 0;
+  }
+  
+  return object;
+  
+}
+
+
+template <>
+inline bool ConfigStore::convertField(const std::string& value) 
+{
+
+  std::istringstream iss(value);
+  bool object;
+
+  iss >> std::ws >> std::boolalpha >> object >> std::ws;
+
+  if ( ! iss.eof() ) {
+    Error("ConfigStore::convertField()","could convert '%s'",value.c_str());
+    throw 0;
+  }
+
+  return object;
+
+}
+
+
+template <class T, class O>
+T ConfigStore::convertVector(const std::vector<std::string>& value) 
+{
+  
+  T object;
+  
+  for (unsigned int i=0; i<value.size(); ++i) {    
+    object.push_back( convertField<O>( value[i] ) );
+  }
+  
+  return object;
+  
+}
+
+
+#endif
