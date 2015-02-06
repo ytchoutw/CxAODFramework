@@ -100,6 +100,7 @@ public:
   TH1F* m_hist_mono_pre_jeteta; //!
   //cutflow
   TH1F* m_hist_mono_cutflow; //!
+  TH1F* m_hist_mono_cutflow_noweight; //!
   TH1F* m_hist_mono_cutflow_fjet_MET; //!
   TH1F* m_hist_mono_cutflow_jetveto_MET; //!
   TH1F* m_hist_mono_cutflow_met_MET; //!

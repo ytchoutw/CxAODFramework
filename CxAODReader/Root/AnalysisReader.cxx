@@ -95,7 +95,7 @@ EL::StatusCode AnalysisReader :: histInitialize ()
   wk()->addOutput(m_hist_VPtTruth);
       
   // b-tagging flavour plots
-  //bTaggerHists(0); // 0 for booking histograms
+  bTaggerHists(0); // 0 for booking histograms
   return EL::StatusCode::SUCCESS;
 
 }
@@ -336,10 +336,10 @@ EL::StatusCode AnalysisReader :: histInitialize_monoWZH()
   static std::string cuts [9] = {"All", "pre-selection",  "250met", "350met", "one fatjet", "no lepton", "addjetveto", "500met" ,"mJ"};
   //pre-selection
   buffer = "Pre-selection E_{T}^{miss}"; nbins = 60; min = 200.; max = 2000.;
-  m_hist_mono_pre_MET = new TH1F(TString(buffer),TString(buffer),nbins, min, max);
+  m_hist_mono_pre_MET = new TH1F(TString(buffer),"Preselection E_{T}^{Miss}; E_{T}^{Miss} [GeV]; Normalized Events / 30 GeV",nbins, min, max);
   wk()->addOutput(m_hist_mono_pre_MET);
   
-  buffer = "Pre-selection #Phi(MET)"; nbins = 16; min = -4.; max = 4. ;
+  buffer = "Pre-selection #phi(MET)"; nbins = 16; min = -4.; max = 4. ;
   m_hist_mono_pre_METPhi = new TH1F(TString(buffer),TString(buffer),nbins, min, max);
   wk()->addOutput(m_hist_mono_pre_METPhi);
 
@@ -380,24 +380,32 @@ EL::StatusCode AnalysisReader :: histInitialize_monoWZH()
   }
   wk()->addOutput(m_hist_mono_cutflow);
   
+  buffer = "Cutflow_noweight"; nbins = 9; min = 0.5; max = 9.5 ;
+  m_hist_mono_cutflow_noweight = new TH1F(TString(buffer),TString(buffer),nbins, min, max);
+  for(unsigned int i=0; i<9; i++) {
+    m_hist_mono_cutflow_noweight->GetXaxis()->SetBinLabel(i+1,cuts[i].c_str());
+  }
+  wk()->addOutput(m_hist_mono_cutflow_noweight);
+  
+  
   buffer = "fatjet cutflow MET"; nbins = 60; min = 200.; max = 2000. ;
-  m_hist_mono_cutflow_fjet_MET = new TH1F(TString(buffer),TString(buffer),nbins, min, max);
+  m_hist_mono_cutflow_fjet_MET = new TH1F(TString(buffer),"fatjet cutflow E_{T}^{Miss}; E_{T}^{Miss} [GeV]; Normalized Events / 30 GeV",nbins, min, max);
   wk()->addOutput(m_hist_mono_cutflow_fjet_MET);
   
   buffer = "jetveto cutflow MET"; nbins = 60; min = 200.; max = 2000. ;
-  m_hist_mono_cutflow_jetveto_MET = new TH1F(TString(buffer),TString(buffer),nbins, min, max);
+  m_hist_mono_cutflow_jetveto_MET = new TH1F(TString(buffer),"jetveto cutflow E_{T}^{Miss}; E_{T}^{Miss} [GeV]; Normalized Events / 30 GeV",nbins, min, max);
   wk()->addOutput(m_hist_mono_cutflow_jetveto_MET);
   
-   buffer = "MET cutflow MET"; nbins = 60; min = 200.; max = 2000. ;
-  m_hist_mono_cutflow_met_MET = new TH1F(TString(buffer),TString(buffer),nbins, min, max);
+   buffer = "500MET cutflow MET"; nbins = 60; min = 200.; max = 2000. ;
+  m_hist_mono_cutflow_met_MET = new TH1F(TString(buffer),"500MET cutflow E_{T}^{Miss}; E_{T}^{Miss} [GeV]; Normalized Events / 30 GeV",nbins, min, max);
   wk()->addOutput(m_hist_mono_cutflow_met_MET);
   
   buffer = "m(fatjet) cutflow MET"; nbins = 60; min = 200.; max = 2000. ;
-  m_hist_mono_cutflow_mj_MET = new TH1F(TString(buffer),TString(buffer),nbins, min, max);
+  m_hist_mono_cutflow_mj_MET = new TH1F(TString(buffer),"m(fatjet) cutflow E_{T}^{Miss}; E_{T}^{Miss} [GeV]; Normalized Events / 30 GeV",nbins, min, max);
   wk()->addOutput(m_hist_mono_cutflow_mj_MET);
   
   buffer = "Signal Fatjet Multiplicity"; nbins = 7; min = -0.5; max = 6.5 ;
-  m_hist_mono_cutflow_Nsigfjet = new TH1F(TString(buffer),TString(buffer),nbins, min, max);
+  m_hist_mono_cutflow_Nsigfjet = new TH1F(TString(buffer),"Signal Fatjet Multiplicity; Signal FatJet Multiplicity; Normalized Events",nbins, min, max);
   wk()->addOutput(m_hist_mono_cutflow_Nsigfjet);
   
   buffer = "#Delta R(fatjet ,addjet)"; nbins = 10; min = 0.; max = 3. ;
@@ -415,7 +423,7 @@ EL::StatusCode AnalysisReader :: histInitialize_monoWZH()
   wk()->addOutput(m_hist_nminusone_jetveto);  
 
   buffer = "met n-1"; nbins = 60; min = 0.; max = 1800. ;
-  m_hist_nminusone_met = new TH1F(TString(buffer),TString(buffer),nbins, min, max);
+  m_hist_nminusone_met = new TH1F(TString(buffer),"Preselection E_{T}^{Miss}; E_{T}^{Miss} [GeV]; Normalized Events / 20 GeV",nbins, min, max);
   wk()->addOutput(m_hist_nminusone_met);  
   
   buffer = "mJ n-1"; nbins = 25; min = 0.; max = 200. ;
@@ -1218,6 +1226,7 @@ EL::StatusCode AnalysisReader :: fill_monoWZH()
   bool pass_jetmass = false;
   
   m_hist_mono_cutflow->Fill(m_hist_mono_cutflow->GetXaxis()->FindBin("All"), m_weight);
+  m_hist_mono_cutflow_noweight->Fill(m_hist_mono_cutflow_noweight->GetXaxis()->FindBin("All"));
 if(pass_presele)
 { 
   
@@ -1251,19 +1260,21 @@ if(pass_presele)
   // 0 electron  0 muon
   if(elecs->size() == 0 && muons->size() == 0 ) pass_nolepton = true;
  
-  //Additional jet veto
+//Additional jet (pt > 40 GV |eat| < 4.5 deltaR(leading fat,addjet) < 4.5) veto 
   std::vector<const xAOD::Jet*> sigJets;
   int njets=selJets.size();
   for(int i(0);i < njets;i++){
 	  TLorentzVector addjet;
 	  addjet.SetPtEtaPhiM(selJets.at(i)->pt(), selJets.at(i)->eta(), selJets.at(i)->phi(), selJets.at(i)->m());
 	  float fjetaddjetDeltaR;
-	  if(selJets.at(i)->pt() < 40000.) continue;
+	  if(selJets.at(i)->pt() > 40000. && abs(selJets.at(i)->eta()) < 4.5 ) continue;
+	  if(fatsigJets.size() > 0)
+	  {
 	  fjetaddjetDeltaR = fjet.DeltaR(addjet);
 	  m_hist_mono_cutflow_fjetaddjetDeltaR->Fill(fjetaddjetDeltaR, m_weight);
-	  if(fatsigJets.size() > 0 && fjetaddjetDeltaR < 0.9) continue;
+	  if(fjetaddjetDeltaR < 0.9) continue;
 	  sigJets.push_back(selJets.at(i));
-
+	  } 
   }
 
   if(sigJets.size() <=1 ) pass_jetveto = true;
@@ -1298,39 +1309,47 @@ if(pass_presele)
   	m_hist_mono_pre_jeteta->Fill(selJets.at(i)->eta()/1000., m_weight); 
   }
   m_hist_mono_cutflow->Fill(m_hist_mono_cutflow->GetXaxis()->FindBin("pre-selection"), m_weight);
+  m_hist_mono_cutflow_noweight->Fill(m_hist_mono_cutflow_noweight->GetXaxis()->FindBin("pre-selection"));
   m_hist_mono_cutflow_Nsigfjet->Fill(fatsigJets.size());
   
   if(pass_250met)
   {
-	m_hist_mono_cutflow->Fill(m_hist_mono_cutflow->GetXaxis()->FindBin("250met"), m_weight);  
+	m_hist_mono_cutflow->Fill(m_hist_mono_cutflow->GetXaxis()->FindBin("250met"), m_weight);
+	m_hist_mono_cutflow_noweight->Fill(m_hist_mono_cutflow_noweight->GetXaxis()->FindBin("250met"));  
   }
   if(pass_250met && pass_350met)
   {
-	m_hist_mono_cutflow->Fill(m_hist_mono_cutflow->GetXaxis()->FindBin("350met"), m_weight);  
+	m_hist_mono_cutflow->Fill(m_hist_mono_cutflow->GetXaxis()->FindBin("350met"), m_weight);
+	m_hist_mono_cutflow_noweight->Fill(m_hist_mono_cutflow_noweight->GetXaxis()->FindBin("350met"));
   }
   if(pass_250met && pass_350met && pass_fatjet)
   {
 	m_hist_mono_cutflow_fjet_MET->Fill(met->met()/1000., m_weight);
 	m_hist_mono_cutflow->Fill(m_hist_mono_cutflow->GetXaxis()->FindBin("one fatjet"), m_weight);
+	m_hist_mono_cutflow_noweight->Fill(m_hist_mono_cutflow_noweight->GetXaxis()->FindBin("one fatjet"));
   }
   if(pass_250met && pass_350met && pass_fatjet && pass_nolepton)
   {
-	m_hist_mono_cutflow->Fill(m_hist_mono_cutflow->GetXaxis()->FindBin("no lepton"), m_weight);  
+	m_hist_mono_cutflow->Fill(m_hist_mono_cutflow->GetXaxis()->FindBin("no lepton"), m_weight);
+	m_hist_mono_cutflow_noweight->Fill(m_hist_mono_cutflow_noweight->GetXaxis()->FindBin("no lepton")); 	
   }
   if(pass_250met && pass_350met && pass_fatjet && pass_nolepton && pass_jetveto)
   {
 	m_hist_mono_cutflow_jetveto_MET->Fill(met->met()/1000., m_weight);
 	m_hist_mono_cutflow->Fill(m_hist_mono_cutflow->GetXaxis()->FindBin("addjetveto"), m_weight);
+	m_hist_mono_cutflow_noweight->Fill(m_hist_mono_cutflow_noweight->GetXaxis()->FindBin("addjetveto"));
   }
   if(pass_250met && pass_350met && pass_fatjet && pass_nolepton && pass_jetveto && pass_metcut)
   {
 	m_hist_mono_cutflow_met_MET->Fill(met->met()/1000., m_weight);
 	m_hist_mono_cutflow->Fill(m_hist_mono_cutflow->GetXaxis()->FindBin("500met"), m_weight);
+	m_hist_mono_cutflow_noweight->Fill(m_hist_mono_cutflow_noweight->GetXaxis()->FindBin("500met"));
   }
   if(pass_250met && pass_350met && pass_fatjet && pass_nolepton && pass_jetveto && pass_metcut && pass_jetmass)
   { 
 	m_hist_mono_cutflow_mj_MET->Fill(met->met()/1000., m_weight);
 	m_hist_mono_cutflow->Fill(m_hist_mono_cutflow->GetXaxis()->FindBin("mJ"), m_weight);
+	m_hist_mono_cutflow_noweight->Fill(m_hist_mono_cutflow_noweight->GetXaxis()->FindBin("mJ"));
   }
   if(debug) std::cout << "Done fill_hist" << std::endl;
  
@@ -1717,7 +1736,7 @@ EL::StatusCode AnalysisReader :: histFinalize ()
   // outputs have been merged.  This is different from finalize() in
   // that it gets called on all worker nodes regardless of whether
   // they processed input events.
-  m_hist_mono_eff_MET->Divide(m_hist_mono_cutflow_mj_MET,m_hist_mono_pre_MET,1,1,"B");
+  //m_hist_mono_eff_MET->Divide(m_hist_mono_cutflow_mj_MET,m_hist_mono_pre_MET,1,1,"B");
 
   double yields;
   float yields_All, yields_pre, yields_nolep, yields_250met, yields_350met, yields_fjet, yields_add, yields_met, yields_mj;
