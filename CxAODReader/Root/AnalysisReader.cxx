@@ -1240,8 +1240,8 @@ if(pass_presele)
   std::vector<const xAOD::Jet*> fatsigJets;
   if(debug) std::cout << "Done fatjet cut start" << std::endl; 
   for(int i(0); i < nfatjet ;i++){
-	  if(fatjets->at(i)->pt() > 250000.) continue;
-	  if(abs(fatjets->at(i)->eta()) < 1.2) continue;
+	  if(fatjets->at(i)->pt() < 250000.) continue;
+	  if(fabs(fatjets->at(i)->eta()) > 1.2) continue;
 	  fatsigJets.push_back(fatjets->at(i));
   }
   
@@ -1267,7 +1267,7 @@ if(pass_presele)
 	  TLorentzVector addjet;
 	  addjet.SetPtEtaPhiM(selJets.at(i)->pt(), selJets.at(i)->eta(), selJets.at(i)->phi(), selJets.at(i)->m());
 	  float fjetaddjetDeltaR;
-	  if(selJets.at(i)->pt() > 40000. && abs(selJets.at(i)->eta()) < 4.5 ) continue;
+	  if(selJets.at(i)->pt() < 40000. && fabs(selJets.at(i)->eta()) > 4.5 ) continue;
 	  if(fatsigJets.size() > 0)
 	  {
 	  fjetaddjetDeltaR = fjet.DeltaR(addjet);
