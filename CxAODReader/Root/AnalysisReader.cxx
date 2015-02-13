@@ -1266,7 +1266,7 @@ if(pass_presele)
   for(int i(0);i < njets;i++){
 	  TLorentzVector addjet;
 	  addjet.SetPtEtaPhiM(selJets.at(i)->pt(), selJets.at(i)->eta(), selJets.at(i)->phi(), selJets.at(i)->m());
-	  float fjetaddjetDeltaR;
+	  float fjetaddjetDeltaR = 1;  //avoid the condition there is no signal fat jet 
 	  if(selJets.at(i)->pt() < 40000. && fabs(selJets.at(i)->eta()) > 4.5 ) continue;
 	  if(fatsigJets.size() > 0)
 	  {
