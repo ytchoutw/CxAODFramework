@@ -26,3 +26,7 @@ Location of your CxAOD dataset.It should have the structure like .../$YOURDATASE
 
 ##Run Analysis
     hsg5frameworkReadCxAOD output_dir
+
+##Useful Links
+CxAODFrameWork Tutorial https://twiki.cern.ch/twiki/bin/view/AtlasProtected/CxAODFrameworkTutorial
+
