@@ -723,9 +723,9 @@ EL::StatusCode AnalysisReader :: fill_0Lep()
   //Photons
   //---------------------------
   const xAOD::PhotonContainer* phots = 0;
-  if( !m_event->retrieve( phots, "PhotonCollection__Nominal" ).isSuccess() ){
-  //  Error("execute()", "Failed to retrieve Photons container. Exiting." );
-  //  return EL::StatusCode::FAILURE;
+  if( !m_event->retrieve( phots, "PhotonCollection___Nominal" ).isSuccess() ){
+    Error("execute()", "Failed to retrieve Photons container. Exiting." );
+    return EL::StatusCode::FAILURE;
   }
 
 
@@ -958,7 +958,7 @@ EL::StatusCode AnalysisReader :: fill_1Lep()
   //Photons
   //---------------------------
   const xAOD::PhotonContainer* phots = 0;
-  if( !m_event->retrieve( phots, "PhotonCollection__Nominal" ).isSuccess() ){
+  if( !m_event->retrieve( phots, "PhotonCollection___Nominal" ).isSuccess() ){
     Error("execute()", "Failed to retrieve Photons container. Exiting." );
     return EL::StatusCode::FAILURE;
   }
@@ -1155,10 +1155,10 @@ EL::StatusCode AnalysisReader :: fill_monoWZH()
   //Photons
   //---------------------------
   const xAOD::PhotonContainer* phots = 0;
-  //if( !m_event->retrieve( phots, "PhotonCollection__Nominal" ).isSuccess() ){
-    //Error("execute()", "Failed to retrieve Photons container. Exiting." );
-    //return EL::StatusCode::FAILURE;
-  //}
+  if( !m_event->retrieve( phots, "PhotonCollection___Nominal" ).isSuccess() ){
+    Error("execute()", "Failed to retrieve Photons container. Exiting." );
+    return EL::StatusCode::FAILURE;
+  }
 
   const xAOD::MissingET * met = 0;
   if(METNominal->size() > 0) met = METNominal->at(0);
@@ -1488,7 +1488,7 @@ EL::StatusCode AnalysisReader :: fill_2Lep()
   //Photons
   //--------------------------- 
   const xAOD::PhotonContainer* phots = 0;
-  if( !m_event->retrieve( phots, "PhotonCollection__Nominal" ).isSuccess() ){
+  if( !m_event->retrieve( phots, "PhotonCollection___Nominal" ).isSuccess() ){
     Error("execute()", "Failed to retrieve Photons container. Exiting.");
     return EL::StatusCode::FAILURE;
   }
