@@ -1173,21 +1173,7 @@ EL::StatusCode AnalysisReader :: fill_monoWZH()
   //Event Selection
   //-------------------------
 
-  //make mass plot fo fat jets before any selection
-  //bool isFatEvent = false;
-  //std::vector<const xAOD::Jet*> fatsigJets;
-  // for (unsigned int iJet(0) ; iJet < fatjets->size(); ++iJet) {
-   // const xAOD::Jet * fatjet = fatjets->at(iJet);
-      // if(m_superDecorator.get(fatjet,FatJetIntProps::isFatJet)){
-          // isFatEvent = true;
-		  //Need to add new hists
-          //m_hist_1lep_fatJetPt->Fill(fatjet->pt()/1000, m_weight);
-          //m_hist_1lep_fatJetm->Fill(fatjet->m()/1000, m_weight);
-      // }else{
-         //std::cout << "not a fatjet" << std::endl;
-      // }
-
-  // }
+ 
   //Need to def new selection
   bool passmonoWZH=m_zerolepSel->passSelection(eventInfo,
                                             met,
@@ -1216,6 +1202,7 @@ EL::StatusCode AnalysisReader :: fill_monoWZH()
   //a least one fatjet 
   if(fatjets->size() < 1) pass_presele = false;
   if(debug) std::cout << "Done pre_selection" << std::endl; 
+  
   //Event selection
   bool pass_250met = false;
   bool pass_350met =false;
@@ -1227,86 +1214,107 @@ EL::StatusCode AnalysisReader :: fill_monoWZH()
   
   m_hist_mono_cutflow->Fill(m_hist_mono_cutflow->GetXaxis()->FindBin("All"), m_weight);
   m_hist_mono_cutflow_noweight->Fill(m_hist_mono_cutflow_noweight->GetXaxis()->FindBin("All"));
+  
 if(pass_presele)
 { 
   
-  //met > 250 GeV
-  if(met->met()/1000. > 250) pass_250met = true;
-  //met > 350 GeV
-  if(met->met()/1000. > 350) pass_350met = true;
-  
-  //fat jet Pt > 250GeV |eta| < 1.2
-  int nfatjet = fatjets->size();
+  //objects selections
   std::vector<const xAOD::Jet*> fatsigJets;
-  if(debug) std::cout << "Done fatjet cut start" << std::endl; 
-  for(int i(0); i < nfatjet ;i++){
-	  if(fatjets->at(i)->pt() < 250000.) continue;
+  std::vector<const xAOD::Electron*> selElectrons;
+  std::vector<const xAOD::Muon*> selMuons;
+  std::vector<const xAOD::Photon*> selPhotons;
+  std::vector<const xAOD::Jet*> sigJets;
+  
+
+  //fat jet selection Pt > 250GeV |eta| < 1.2
+  for(unsigned int i(0); i < fatjets->size() ;i++){
+	  if(fatjets->at(i)->pt()/1000. < 250.) continue;
 	  if(fabs(fatjets->at(i)->eta()) > 1.2) continue;
 	  fatsigJets.push_back(fatjets->at(i));
-  }
-  
-  if(fatsigJets.size() > 0) pass_fatjet = true; 
+  }  
   //find leading fatjet
   int leadingfatjet = 0;
   for(unsigned int i(0);i < fatsigJets.size();i++){
 	if(fatsigJets.at(i)->pt() > fatsigJets.at(leadingfatjet)->pt() ) leadingfatjet = i; 
   }
+    
   
-  TLorentzVector fjet;
- 
+  TLorentzVector fjet; 
   if(fatsigJets.size() > 0) fjet.SetPtEtaPhiM(fatsigJets.at(leadingfatjet)->pt(), fatsigJets.at(leadingfatjet)->eta(), fatsigJets.at(leadingfatjet)->phi(), fatsigJets.at(leadingfatjet)->m());
-  if(debug) std::cout << "Done fatjet cut" << std::endl; 
- 
-  // 0 electron  0 muon
-  if(elecs->size() == 0 && muons->size() == 0 ) pass_nolepton = true;
- 
-//Additional jet (pt > 40 GV |eat| < 4.5 deltaR(leading fat,addjet) < 4.5) veto 
-  std::vector<const xAOD::Jet*> sigJets;
-  int njets=selJets.size();
-  for(int i(0);i < njets;i++){
+
+
+  //loose quality cut
+  //Electrons pT > 10 GeV  |eta| < 2.47
+  //Photons pT > 10 GeV |eta| < 2.37
+  //Muon pT > 10GeV |eta| < 2.5
+  for(unsigned int i(0); i < elecs->size();i++){
+	  if( elecs->at(i)->pt() /1000. < 10 || fabs(elecs->at(i)->eta()) > 2.47) continue;
+	  selElectrons.push_back(elecs->at(i));
+	  //std::cout << "Elecrons!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" <<std::endl;
+  }
+  for(unsigned int i(0); i < phots->size();i++){
+	  if( phots->at(i)->pt() /1000. < 10 || fabs(phots->at(i)->eta()) > 2.37) continue;
+	  selPhotons.push_back(phots->at(i));
+	  //std::cout << "Photon!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" <<std::endl;
+  }
+  for(unsigned int i(0); i < muons->size();i++){
+	  if( muons->at(i)->pt() /1000. < 10 || fabs(muons->at(i)->eta()) > 2.5) continue;
+	  selMuons.push_back(muons->at(i));
+	  //std::cout << "Muon!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" <<std::endl;
+  }
+  
+  //addjets selection (pT > 40 GeV |eat| < 4.5 deltaR(leading fat,addjet) < 4.5) 
+  for(unsigned int i(0);i < selJets.size();i++){
 	  TLorentzVector addjet;
 	  addjet.SetPtEtaPhiM(selJets.at(i)->pt(), selJets.at(i)->eta(), selJets.at(i)->phi(), selJets.at(i)->m());
-	  float fjetaddjetDeltaR = 1;  //avoid the condition there is no signal fat jet 
-	  if(selJets.at(i)->pt() < 40000. && fabs(selJets.at(i)->eta()) > 4.5 ) continue;
-	  if(fatsigJets.size() > 0)
+	  float fjetaddjetDeltaR = 1.;  //set to 1 avoid the condition no signal fat jet 
+	  if(selJets.at(i)->pt()/1000. < 40 || fabs(selJets.at(i)->eta()) > 4.5 ) continue;
+	  if(fatsigJets.size() > 0) 
 	  {
 	  fjetaddjetDeltaR = fjet.DeltaR(addjet);
 	  m_hist_mono_cutflow_fjetaddjetDeltaR->Fill(fjetaddjetDeltaR, m_weight);
+	  }
 	  if(fjetaddjetDeltaR < 0.9) continue;
 	  sigJets.push_back(selJets.at(i));
-	  } 
+	   
   }
 
-  if(sigJets.size() <=1 ) pass_jetveto = true;
-  if(debug) std::cout << "Done jetveto cut" << std::endl; 
   
+  //SR
+  //met > 250 GeV
+  if(met->met()/1000. > 250) pass_250met = true;
+  //met > 350 GeV
+  if(met->met()/1000. > 350) pass_350met = true;
+  //a least one fatjet   
+  if(fatsigJets.size() > 0) pass_fatjet = true; 
+  //leptons&photons veto
+  if(selElectrons.size() == 0 && selMuons.size() == 0 && selPhotons.size() ==0) pass_nolepton = true;
+  //at most one additional jet 
+  if(sigJets.size() < 2 ) pass_jetveto = true;
   //MET > 500 GeV
-  if((met->met()/1000.) > 500 ) pass_metcut = true;
-  
-  
+  if(met->met()/1000. > 500 ) pass_metcut = true;  
   // 50 < mJ < 120 GeV 
   if(fatsigJets.size() > 0)
   {
-	  if(fatsigJets.at(leadingfatjet)->m() < 120000. && fatsigJets.at(leadingfatjet)->m() > 50000.) pass_jetmass = true;
+  if(fatsigJets.at(leadingfatjet)->m()/1000. < 120. && fatsigJets.at(leadingfatjet)->m()/1000. > 50.) pass_jetmass = true;
   }
 
-  if(debug) std::cout << "Done selection" << std::endl;
-  
-  //fill cutflow hist 
+
   
   
- 
+  
+  //fill cutflow hist  
   m_hist_mono_pre_MET->Fill(met->met()/1000., m_weight);
-  m_hist_mono_pre_Nfatjet->Fill(nfatjet);
-  for(int i(0); i < nfatjet ;i++){
+  m_hist_mono_pre_Nfatjet->Fill(fatjets->size());
+  for(unsigned int i(0); i < fatjets->size() ;i++){
 	m_hist_mono_pre_fatjetm->Fill(fatjets->at(i)->m()/1000., m_weight); 
 	m_hist_mono_pre_fatjetpt->Fill(fatjets->at(i)->pt()/1000., m_weight); 
-	m_hist_mono_pre_fatjeteta->Fill(fatjets->at(i)->eta()/1000., m_weight); 
+	m_hist_mono_pre_fatjeteta->Fill(fatjets->at(i)->eta(), m_weight); 
   }
-  for(int i(0); i < njets ;i++){
+  for(unsigned int i(0); i < selJets.size() ;i++){
 	m_hist_mono_pre_jetm->Fill(selJets.at(i)->m()/1000., m_weight); 
 	m_hist_mono_pre_jetpt->Fill(selJets.at(i)->pt()/1000., m_weight); 
-  	m_hist_mono_pre_jeteta->Fill(selJets.at(i)->eta()/1000., m_weight); 
+  	m_hist_mono_pre_jeteta->Fill(selJets.at(i)->eta(), m_weight); 
   }
   m_hist_mono_cutflow->Fill(m_hist_mono_cutflow->GetXaxis()->FindBin("pre-selection"), m_weight);
   m_hist_mono_cutflow_noweight->Fill(m_hist_mono_cutflow_noweight->GetXaxis()->FindBin("pre-selection"));
@@ -1351,7 +1359,7 @@ if(pass_presele)
 	m_hist_mono_cutflow->Fill(m_hist_mono_cutflow->GetXaxis()->FindBin("mJ"), m_weight);
 	m_hist_mono_cutflow_noweight->Fill(m_hist_mono_cutflow_noweight->GetXaxis()->FindBin("mJ"));
   }
-  if(debug) std::cout << "Done fill_hist" << std::endl;
+  //if(debug) std::cout << "Done fill_hist" << std::endl;
  
   //fill n-1 histogram
   if(pass_nolepton && pass_250met && pass_350met && pass_jetveto && pass_metcut && pass_jetmass)
@@ -1736,33 +1744,5 @@ EL::StatusCode AnalysisReader :: histFinalize ()
   // outputs have been merged.  This is different from finalize() in
   // that it gets called on all worker nodes regardless of whether
   // they processed input events.
-  //m_hist_mono_eff_MET->Divide(m_hist_mono_cutflow_mj_MET,m_hist_mono_pre_MET,1,1,"B");
-
-  double yields;
-  float yields_All, yields_pre, yields_nolep, yields_250met, yields_350met, yields_fjet, yields_add, yields_met, yields_mj;
-  
-  yields_All =  m_hist_mono_cutflow->GetBinContent(m_hist_mono_cutflow->GetXaxis()->FindBin("All"));
-  yields_All *= 2000;
-  yields_pre =  m_hist_mono_cutflow->GetBinContent(m_hist_mono_cutflow->GetXaxis()->FindBin("pre-selection"));
-  yields_pre *= 2000;
-    yields_250met = m_hist_mono_cutflow->GetBinContent(m_hist_mono_cutflow->GetXaxis()->FindBin("250met"));
-  yields_250met *=2000;
-  yields_350met = m_hist_mono_cutflow->GetBinContent(m_hist_mono_cutflow->GetXaxis()->FindBin("350met")); 
-  yields_350met *=2000;
-  yields_fjet =  m_hist_mono_cutflow->GetBinContent(m_hist_mono_cutflow->GetXaxis()->FindBin("one fatjet"));
-  yields_fjet *= 2000;
-  yields_nolep = m_hist_mono_cutflow->GetBinContent(m_hist_mono_cutflow->GetXaxis()->FindBin("no lepton"));
-  yields_nolep *=2000;
-  yields_add =  m_hist_mono_cutflow->GetBinContent(m_hist_mono_cutflow->GetXaxis()->FindBin("addjetveto"));
-  yields_add *= 2000;
-  yields_met =  m_hist_mono_cutflow->GetBinContent(m_hist_mono_cutflow->GetXaxis()->FindBin("500met"));
-  yields_met *= 2000;
-  yields_mj =  m_hist_mono_cutflow->GetBinContent(m_hist_mono_cutflow->GetXaxis()->FindBin("mJ"));
-  yields_mj *= 2000;
-  std::cout << "yields All/" <<  yields_All << "/pre/" <<  yields_pre << "/250met/" << yields_250met << "/350met/" << yields_350met << "/onefjet/" << yields_fjet << "/no lepton/" << yields_nolep << "/addveto/" << yields_add << "/500met/" << yields_met << "/mJ/" << yields_mj << std::endl;
-  yields = m_hist_mono_cutflow_mj_MET->Integral();
-  yields *= 2000;
-  std::cout << "yields(2fb^-1) :" <<  yields << std::endl;
-  
   return EL::StatusCode::SUCCESS;
 }
