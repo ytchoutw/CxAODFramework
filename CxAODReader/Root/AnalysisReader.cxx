@@ -333,7 +333,7 @@ EL::StatusCode AnalysisReader :: histInitialize_monoWZH()
   int nbins;
   double min;
   double max;
-  static std::string cuts [9] = {"All", "pre-selection",  "250met", "350met", "one fatjet", "no lepton", "addjetveto", "500met" ,"mJ"};
+  static std::string cuts [12] = {"All", "pre-selection",  "250met", "350met", "one fatjet", "no electron", "no muon", "no photon", "addjetveto", "phi metjet", "500met" ,"mJ"};
   //pre-selection
   buffer = "Pre-selection E_{T}^{miss}"; nbins = 60; min = 200.; max = 2000.;
   m_hist_mono_pre_MET = new TH1F(TString(buffer),"Preselection E_{T}^{Miss}; E_{T}^{Miss} [GeV]; Normalized Events / 30 GeV",nbins, min, max);
@@ -373,16 +373,16 @@ EL::StatusCode AnalysisReader :: histInitialize_monoWZH()
   
   
   //cutflow
-  buffer = "Cutflow"; nbins = 9; min = 0.5; max = 9.5 ;
-  m_hist_mono_cutflow = new TH1F(TString(buffer),TString(buffer),nbins, min, max);
-  for(unsigned int i=0; i<9; i++) {
+  buffer = "Cutflow"; nbins = 12; min = 0.5; max = 12.5 ;
+  m_hist_mono_cutflow = new TH1D(TString(buffer),TString(buffer),nbins, min, max);
+  for(unsigned int i=0; i<12; i++) {
     m_hist_mono_cutflow->GetXaxis()->SetBinLabel(i+1,cuts[i].c_str());
   }
   wk()->addOutput(m_hist_mono_cutflow);
   
-  buffer = "Cutflow_noweight"; nbins = 9; min = 0.5; max = 9.5 ;
-  m_hist_mono_cutflow_noweight = new TH1F(TString(buffer),TString(buffer),nbins, min, max);
-  for(unsigned int i=0; i<9; i++) {
+  buffer = "Cutflow_noweight"; nbins = 12; min = 0.5; max = 12.5 ;
+  m_hist_mono_cutflow_noweight = new TH1D(TString(buffer),TString(buffer),nbins, min, max);
+  for(unsigned int i=0; i<12; i++) {
     m_hist_mono_cutflow_noweight->GetXaxis()->SetBinLabel(i+1,cuts[i].c_str());
   }
   wk()->addOutput(m_hist_mono_cutflow_noweight);
@@ -459,6 +459,7 @@ EL::StatusCode AnalysisReader :: fileExecute ()
   // Flag if is Pt0 slice, to kill overlapping events. PtV slices only in 13TeV xAOD samples
   TString filename(inputfile->GetName());
   m_isSherpaPt0VJets= (filename.Contains("Pt0") && m_comEnergy=="13TeV") ? true : false;
+  if(filename.Contains("Sherpa_CT10_W") && filename.Contains("Pt0")  && m_comEnergy=="13TeV") m_SherpaPt0VJetsCut = 40000 ;
 
   // general Sherpa flag
   m_isSherpaVJets = (filename.Contains("Sherpa")) ? true : false;
@@ -1088,10 +1089,9 @@ EL::StatusCode AnalysisReader :: fill_1Lep()
 EL::StatusCode AnalysisReader :: fill_monoWZH()
 {
 
-  bool debug = false;
-  if(debug) std::cout<< "Filling" <<std::endl; 
 
-//need to add cutflow hist paul
+
+
   //data GRL
   const xAOD::EventInfo* eventInfo = 0;
   if( ! m_event->retrieve( eventInfo, "EventInfo___Nominal").isSuccess() ){
@@ -1201,14 +1201,17 @@ EL::StatusCode AnalysisReader :: fill_monoWZH()
   if((met->met()/1000.) < 200 ) pass_presele = false;
   //a least one fatjet 
   if(fatjets->size() < 1) pass_presele = false;
-  if(debug) std::cout << "Done pre_selection" << std::endl; 
+ 
   
   //Event selection
   bool pass_250met = false;
   bool pass_350met =false;
   bool pass_fatjet = false;
-  bool pass_nolepton = false;
+  bool pass_noelectron = false;
+  bool pass_nomuon = false;
+  bool pass_nophoton = false;
   bool pass_jetveto = false;
+  bool pass_phimetjet = false;
   bool pass_metcut = false;
   bool pass_jetmass = false;
   
@@ -1241,7 +1244,8 @@ if(pass_presele)
   
   TLorentzVector fjet; 
   if(fatsigJets.size() > 0) fjet.SetPtEtaPhiM(fatsigJets.at(leadingfatjet)->pt(), fatsigJets.at(leadingfatjet)->eta(), fatsigJets.at(leadingfatjet)->phi(), fatsigJets.at(leadingfatjet)->m());
-
+  TLorentzVector metVec;
+  metVec.SetPxPyPzE(met->mpx()/1000., met->mpy()/1000., 0, met->met()/1000.);
 
   //loose quality cut
   //Electrons pT > 10 GeV  |eta| < 2.47
@@ -1280,6 +1284,8 @@ if(pass_presele)
   }
 
   
+
+  
   //SR
   //met > 250 GeV
   if(met->met()/1000. > 250) pass_250met = true;
@@ -1288,9 +1294,19 @@ if(pass_presele)
   //a least one fatjet   
   if(fatsigJets.size() > 0) pass_fatjet = true; 
   //leptons&photons veto
-  if(selElectrons.size() == 0 && selMuons.size() == 0 && selPhotons.size() ==0) pass_nolepton = true;
+  if(selElectrons.size() == 0 ) pass_noelectron = true;
+  if(selMuons.size() == 0) pass_nomuon = true;
+  if(selPhotons.size() ==0) pass_nophoton = true;  
   //at most one additional jet 
   if(sigJets.size() < 2 ) pass_jetveto = true;
+  //DeltaPhi(met,jets) > 0.4
+  for(unsigned int j(0);j < sigJets.size();j++){
+	TLorentzVector jetvec;
+	jetvec.SetPtEtaPhiM(sigJets.at(j)->pt(), sigJets.at(j)->eta(), sigJets.at(j)->phi(), sigJets.at(j)->m());
+	if(jetvec.DeltaPhi(metVec) > 0.4) pass_phimetjet = true;
+	
+	
+  }
   //MET > 500 GeV
   if(met->met()/1000. > 500 ) pass_metcut = true;  
   // 50 < mJ < 120 GeV 
@@ -1298,10 +1314,61 @@ if(pass_presele)
   {
   if(fatsigJets.at(leadingfatjet)->m()/1000. < 120. && fatsigJets.at(leadingfatjet)->m()/1000. > 50.) pass_jetmass = true;
   }
+  
 
 
+  //CR
+  //Muon CR 
+  bool passMuonCR = false; 
+  bool oneMuon = false;
+  if(selElectrons.size() == 0 && selMuons.size() > 0 && selPhotons.size() ==0) oneMuon = true;
+  if(pass_250met && pass_350met && pass_fatjet && oneMuon && pass_jetveto && pass_metcut && pass_jetmass) passMuonCR = true;
   
+  //QCD CR1 
+  //one extra jet point to MET
+  bool passQCDCR1 = false;
+  if(pass_250met && pass_350met && pass_fatjet && pass_noelectron && pass_nomuon && pass_nophoton && sigJets.size()==1 && pass_metcut && pass_jetmass)                 //
+  {	
+	TLorentzVector addjet;
+	addjet.SetPtEtaPhiM(sigJets.at(0)->pt(), sigJets.at(0)->eta(), sigJets.at(0)->phi(), sigJets.at(0)->m());
+	TLorentzVector metVec;
+	metVec.SetPxPyPzE(met->mpx()/1000., met->mpy()/1000., 0, met->met()/1000.);
+	if(metVec.DeltaPhi(addjet) < 0.4) passQCDCR1 = true;
+
+	
+  } 	
   
+  //QCD CR2
+  //leading extra jet away from MET, subleading point to MET 
+  bool passQCDCR2 = false;
+  if(pass_250met && pass_350met && pass_fatjet && pass_noelectron && pass_nomuon && pass_nophoton && sigJets.size()==2 && pass_metcut && pass_jetmass)                        //
+  {
+	//find leading Antikt4 signal jet
+	int leadsig = 0;
+	int subsig = 1;
+	if(sigJets.at(1)->pt() > sigJets.at(0)->pt()) 
+	{ 
+		leadsig = 1; 
+		subsig = 0;
+	}
+	
+	TLorentzVector leadjet;
+	leadjet.SetPtEtaPhiM(sigJets.at(leadsig)->pt(), sigJets.at(leadsig)->eta(), sigJets.at(leadsig)->phi(), sigJets.at(leadsig)->m());
+	TLorentzVector subjet;
+	subjet.SetPtEtaPhiM(sigJets.at(subsig)->pt(), sigJets.at(subsig)->eta(), sigJets.at(subsig)->phi(), sigJets.at(subsig)->m());
+
+	
+	if(metVec.DeltaPhi(leadjet) > 0.4 && metVec.DeltaPhi(subjet) < 0.4) passQCDCR2 = true;
+	
+  }
+  
+  //Top CR
+  bool passTopCR = false;
+  //Z CR
+  bool passZCR = false;
+  bool twoMuon = false;
+  if(selElectrons.size() == 0 && selMuons.size() ==2 && selPhotons.size() ==0) twoMuon = true;
+  if(pass_250met && pass_350met && pass_fatjet && twoMuon && pass_jetveto && pass_metcut && pass_jetmass) passMuonCR = true;
   
   //fill cutflow hist  
   m_hist_mono_pre_MET->Fill(met->met()/1000., m_weight);
@@ -1336,45 +1403,60 @@ if(pass_presele)
 	m_hist_mono_cutflow->Fill(m_hist_mono_cutflow->GetXaxis()->FindBin("one fatjet"), m_weight);
 	m_hist_mono_cutflow_noweight->Fill(m_hist_mono_cutflow_noweight->GetXaxis()->FindBin("one fatjet"));
   }
-  if(pass_250met && pass_350met && pass_fatjet && pass_nolepton)
+  if(pass_250met && pass_350met && pass_fatjet && pass_noelectron)
   {
-	m_hist_mono_cutflow->Fill(m_hist_mono_cutflow->GetXaxis()->FindBin("no lepton"), m_weight);
-	m_hist_mono_cutflow_noweight->Fill(m_hist_mono_cutflow_noweight->GetXaxis()->FindBin("no lepton")); 	
+	m_hist_mono_cutflow->Fill(m_hist_mono_cutflow->GetXaxis()->FindBin("no electron"), m_weight);
+	m_hist_mono_cutflow_noweight->Fill(m_hist_mono_cutflow_noweight->GetXaxis()->FindBin("no electron")); 	
+  }  
+  if(pass_250met && pass_350met && pass_fatjet && pass_noelectron && pass_nomuon)
+  {
+	m_hist_mono_cutflow->Fill(m_hist_mono_cutflow->GetXaxis()->FindBin("no muon"), m_weight);
+	m_hist_mono_cutflow_noweight->Fill(m_hist_mono_cutflow_noweight->GetXaxis()->FindBin("no muon")); 	
   }
-  if(pass_250met && pass_350met && pass_fatjet && pass_nolepton && pass_jetveto)
+  if(pass_250met && pass_350met && pass_fatjet && pass_noelectron && pass_nomuon && pass_nophoton)
+  {
+	m_hist_mono_cutflow->Fill(m_hist_mono_cutflow->GetXaxis()->FindBin("no photon"), m_weight);
+	m_hist_mono_cutflow_noweight->Fill(m_hist_mono_cutflow_noweight->GetXaxis()->FindBin("no photon")); 	
+  }
+  if(pass_250met && pass_350met && pass_fatjet &&  pass_noelectron && pass_nomuon && pass_nophoton && pass_jetveto)
   {
 	m_hist_mono_cutflow_jetveto_MET->Fill(met->met()/1000., m_weight);
 	m_hist_mono_cutflow->Fill(m_hist_mono_cutflow->GetXaxis()->FindBin("addjetveto"), m_weight);
 	m_hist_mono_cutflow_noweight->Fill(m_hist_mono_cutflow_noweight->GetXaxis()->FindBin("addjetveto"));
   }
-  if(pass_250met && pass_350met && pass_fatjet && pass_nolepton && pass_jetveto && pass_metcut)
+  if(pass_250met && pass_350met && pass_fatjet &&  pass_noelectron && pass_nomuon && pass_nophoton && pass_jetveto && pass_phimetjet)
+  {
+	m_hist_mono_cutflow->Fill(m_hist_mono_cutflow->GetXaxis()->FindBin("phi metjet"), m_weight);
+	m_hist_mono_cutflow_noweight->Fill(m_hist_mono_cutflow_noweight->GetXaxis()->FindBin("phi metjet"));
+  }
+  if(pass_250met && pass_350met && pass_fatjet &&  pass_noelectron && pass_nomuon && pass_nophoton && pass_jetveto && pass_phimetjet && pass_metcut)
   {
 	m_hist_mono_cutflow_met_MET->Fill(met->met()/1000., m_weight);
 	m_hist_mono_cutflow->Fill(m_hist_mono_cutflow->GetXaxis()->FindBin("500met"), m_weight);
 	m_hist_mono_cutflow_noweight->Fill(m_hist_mono_cutflow_noweight->GetXaxis()->FindBin("500met"));
   }
-  if(pass_250met && pass_350met && pass_fatjet && pass_nolepton && pass_jetveto && pass_metcut && pass_jetmass)
+  if(pass_250met && pass_350met && pass_fatjet &&  pass_noelectron && pass_nomuon && pass_nophoton && pass_jetveto && pass_phimetjet && pass_metcut && pass_jetmass)
   { 
 	m_hist_mono_cutflow_mj_MET->Fill(met->met()/1000., m_weight);
 	m_hist_mono_cutflow->Fill(m_hist_mono_cutflow->GetXaxis()->FindBin("mJ"), m_weight);
 	m_hist_mono_cutflow_noweight->Fill(m_hist_mono_cutflow_noweight->GetXaxis()->FindBin("mJ"));
   }
-  //if(debug) std::cout << "Done fill_hist" << std::endl;
+ 
  
   //fill n-1 histogram
-  if(pass_nolepton && pass_250met && pass_350met && pass_jetveto && pass_metcut && pass_jetmass)
+  if( pass_noelectron && pass_nomuon && pass_nophoton && pass_250met && pass_350met && pass_jetveto && pass_metcut && pass_jetmass)
   {
 	m_hist_nminusone_fjet->Fill(fatsigJets.size());
   } 
-  if(pass_nolepton && pass_250met && pass_350met && pass_fatjet && pass_metcut && pass_jetmass)
+  if( pass_noelectron && pass_nomuon && pass_nophoton && pass_250met && pass_350met && pass_fatjet && pass_metcut && pass_jetmass)
   {
 	m_hist_nminusone_jetveto->Fill(sigJets.size());
   } 
-  if(pass_nolepton && pass_250met && pass_350met && pass_fatjet && pass_jetveto && pass_jetmass)
+  if( pass_noelectron && pass_nomuon && pass_nophoton && pass_250met && pass_350met && pass_fatjet && pass_jetveto && pass_jetmass)
   {
 	m_hist_nminusone_met->Fill(met->met()/1000., m_weight);
   } 
-  if(pass_nolepton && pass_250met && pass_350met && pass_fatjet && pass_jetveto && pass_metcut)
+  if( pass_noelectron && pass_nomuon && pass_nophoton && pass_250met && pass_350met && pass_fatjet && pass_jetveto && pass_metcut)
   {
 	m_hist_nminusone_mj->Fill(fatsigJets.at(leadingfatjet)->m()/1000., m_weight);
   } 

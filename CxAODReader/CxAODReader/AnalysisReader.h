@@ -78,13 +78,13 @@ public:
   int m_analysisType;
   int m_eventCounter; //!
   bool m_isMC; //!
-  float m_weight; //!
-  float m_sumOfWeights; //!  correct for the luminosity of the MC file
+  double m_weight; //!
+  double m_sumOfWeights; //!  correct for the luminosity of the MC file
   TString m_comEnergy; 
   bool m_isSherpaVJets; // is Sherpa file
   bool m_isSherpaPt0VJets; //! is present sample SherpaVJets Pt0
   float m_SherpaPt0VJetsCut; //! cut Pt0 events overlapping with other PtV slices
-
+  
   
   //  TH1F* m_hist_0lep_; //!
   //monoWZH hists
@@ -99,8 +99,8 @@ public:
   TH1F* m_hist_mono_pre_jetpt; //!
   TH1F* m_hist_mono_pre_jeteta; //!
   //cutflow
-  TH1F* m_hist_mono_cutflow; //!
-  TH1F* m_hist_mono_cutflow_noweight; //!
+  TH1D* m_hist_mono_cutflow; //!
+  TH1D* m_hist_mono_cutflow_noweight; //!
   TH1F* m_hist_mono_cutflow_fjet_MET; //!
   TH1F* m_hist_mono_cutflow_jetveto_MET; //!
   TH1F* m_hist_mono_cutflow_met_MET; //!
