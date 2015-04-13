@@ -1117,7 +1117,7 @@ EL::StatusCode AnalysisReader :: fill_monoWZH()
 
 
   const xAOD::JetContainer* jets = 0;
-  if ( !m_event->retrieve( jets, "AntiKt4EMTopoJets___Nominal" ).isSuccess() ){ // retrieve arguments: container type, container key
+  if ( !m_event->retrieve( jets, "AntiKt4LCTopoJets___Nominal" ).isSuccess() ){ // retrieve arguments: container type, container key
     Error("execute()", "Failed to retrieve AntiKt4LCTopoJets container. Exiting." );
     return EL::StatusCode::FAILURE;
   }
@@ -1127,12 +1127,19 @@ EL::StatusCode AnalysisReader :: fill_monoWZH()
   //----------------------
 
 
-  const xAOD::JetContainer* fatjets = 0;
+  /*const xAOD::JetContainer* fatjets = 0;
   if ( !m_event->retrieve( fatjets, "CamKt12LCTopoJets___Nominal" ).isSuccess() ){ // retrieve arguments: container type, container key
     Error("execute()", "Failed to retrieve CamKt12LCTopoJets container. Exiting." );
     return EL::StatusCode::FAILURE;
+  }*/
+  //trimmed AntiKt10Jet
+   const xAOD::JetContainer* fatjets = 0;
+  if ( !m_event->retrieve( fatjets, "AntiKt10LCTopoJets___TrimmedPtFrac5SmallR20" ).isSuccess() ){ // retrieve arguments: container type, container key
+    Error("execute()", "Failed to retrieve AntiKt10LCTopoJets___TrimmedPtFrac5SmallR20 container. Exiting." );
+    return EL::StatusCode::FAILURE;
   }
-
+  
+  
   const xAOD::MuonContainer* muons = 0;
   if ( !m_event->retrieve( muons, "Muons___Nominal" ).isSuccess() ){ // retrieve arguments: container type, container key
     Error("execute()", "Failed to retrieve Muons container. Exiting." );
