@@ -1212,11 +1212,11 @@ EL::StatusCode AnalysisReader :: fill_monoWZH()
   //pre-selection 
   //could be implement in CxAODMaker  
   bool pass_presele = true;
-  if(METNominal->size() == 0) pass_presele = false;
+  //if(METNominal->size() == 0) pass_presele = false;
   //MET > 200GeV
-  if((met->met()/1000.) < 200 ) pass_presele = false;
+  //if((met->met()/1000.) < 200 ) pass_presele = false;
   //a least one fatjet 
-  if(fatjets->size() < 1) pass_presele = false;
+  //if(fatjets->size() < 1) pass_presele = false;
  
   
   //Event selection
