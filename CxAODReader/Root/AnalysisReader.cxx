@@ -1248,6 +1248,7 @@ if(pass_presele)
   std::vector<const xAOD::Muon*> selMuons;
   std::vector<const xAOD::Photon*> selPhotons;
   std::vector<const xAOD::Jet*> sigJets;
+  std::vector<const xAOD::Jet*> metJets;
   std::vector<const xAOD::Jet*> subJets;
   std::vector<const xAOD::Jet*> subBJets;
   
@@ -1269,7 +1270,7 @@ if(pass_presele)
   TLorentzVector fjet; 
   if(fatsigJets.size() > 0) fjet.SetPtEtaPhiM(fatsigJets.at(leadingfatjet)->pt(), fatsigJets.at(leadingfatjet)->eta(), fatsigJets.at(leadingfatjet)->phi(), fatsigJets.at(leadingfatjet)->m());
   TLorentzVector metVec;
-  metVec.SetPxPyPzE(met->mpx()/1000., met->mpy()/1000., 0, met->met()/1000.);
+  metVec.SetPxPyPzE(met->mpx(), met->mpy(), 0, met->met());
   //loose quality cut
   //Electrons: isVHLElectron, Isolation cut: ptcone20/pt<0.1
   //Photons: removed   
@@ -1323,6 +1324,23 @@ if(pass_presele)
 	  sigJets.push_back(selJets.at(i));
 	   
   }
+  //select met jet 
+  for(unsigned int iJet(0);iJet < selJets.size();iJet++){
+	const xAOD::Jet* Jet = selJets.at(iJet);
+	if(!(((Jet->pt()/1000.) > 20 )&& (fabs(Jet->eta()) < 4.5))) continue;
+	TLorentzVector jetvec;
+	jetvec.SetPtEtaPhiM(Jet->pt(), Jet->eta(), Jet->phi(), Jet->m());
+	//OverlapRemove if ΔR(akt4, veto electron ) < 0.4
+	bool overlapRemove = false;
+	for(unsigned int ielec(0);ielec < selElectrons.size();ielec++){
+		TLorentzVector elec;
+		elec.SetPtEtaPhiM(selElectrons.at(ielec)->pt(), selElectrons.at(ielec)->eta(), selElectrons.at(ielec)->phi(), selElectrons.at(ielec)->m());
+		if(elec.DeltaR(jetvec) < 0.4) overlapRemove = true;
+	}  
+	if(overlapRemove) continue;
+	metJets.push_back(Jet);
+  }
+  
   //find AntiKt10 subjet (akt4 jet pT > 20 GeV, |η| < 2.5 ΔR(fat jet, b-tagged jet)<1.0
   for(unsigned int iJet(0); iJet < selJets.size(); iJet++){
 	const xAOD::Jet* Jet = selJets.at(iJet);
@@ -1356,9 +1374,9 @@ if(pass_presele)
   if(sigJets.size() < 2 ) pass_jetveto = true;
   //DeltaPhi(met,jets) > 0.4
   double minPhi = 1;
-  for(unsigned int j(0);j < sigJets.size();j++){
+  for(unsigned int j(0);j < metJets.size();j++){
 	TLorentzVector jetvec;
-	jetvec.SetPtEtaPhiM(sigJets.at(j)->pt(), sigJets.at(j)->eta(), sigJets.at(j)->phi(), sigJets.at(j)->m());
+	jetvec.SetPtEtaPhiM(metJets.at(j)->pt(), metJets.at(j)->eta(), metJets.at(j)->phi(), metJets.at(j)->m());
 	if(fabs(jetvec.DeltaPhi(metVec)) < minPhi) minPhi = fabs(jetvec.DeltaPhi(metVec));
   }
   if(minPhi > 0.4) pass_phimetjet = true;
@@ -1387,11 +1405,49 @@ if(pass_presele)
 
 
   //CR
-  //Muon CR 
-  bool passMuonCR = false; 
-  bool oneMuon = false;
-  if(selElectrons.size() == 0 && selMuons.size() > 0 && selPhotons.size() ==0) oneMuon = true;
-  if(pass_250met && pass_fatjet && oneMuon && pass_jetveto && pass_metcut && pass_jetmass) passMuonCR = true;
+  //W+jets CR
+  //Only one muon or Only electron
+  //1 fanjet with pT>250GeV and |eta|<1.2
+  //pTW (vector sum of lepton + MET) >40GeV
+  //MT > 40GeV
+  //N b-tagged akt4 jet ==0
+  
+  bool pass_WCR = false;
+  bool pass_onelep = false;
+  bool pass_pTW = false;
+  bool pass_MT = false;
+  bool pass_zerobJet = false;
+  bool oneElec = false;
+  bool oneMuon =false;
+  
+  TLorentzVector WVec;
+  std::vector<const xAOD::Jet*> WCRbJets;
+  double MT = 0;
+  if(selElectrons.size() == 1) oneElec = true;
+  if(selMuons.size()==1) oneMuon = true;
+  if((selElectrons.size()+selMuons.size()) == 1 ){
+	pass_onelep = true;
+	TLorentzVector lep;
+	if(oneElec) lep.SetPtEtaPhiM(selElectrons.at(0)->pt(), selElectrons.at(0)->eta(), selElectrons.at(0)->phi(), selElectrons.at(0)->m());
+	if(oneMuon) lep.SetPtEtaPhiM(selMuons.at(0)->pt(), selMuons.at(0)->eta(), selMuons.at(0)->phi(), selMuons.at(0)->m());
+  	WVec = lep + metVec;
+	//transverse mass of lep  
+	MT = TMath::Sqrt(2*lep.Pt()*(met->met())*(1-TMath::Cos(lep.DeltaPhi(metVec))))/1000.;    //GeV
+	
+  }
+  //b-taged AntiKt4jet 
+  for(unsigned int iJet(0); iJet < sigJets.size();iJet++){
+	const xAOD::Jet* Jet = sigJets.at(iJet);  
+	if(!(m_superDecorator.get(Jet, JetFloatProps::MV1) > 0.971966))  continue; // 70% operation point 
+	WCRbJets.push_back(Jet);
+		
+  }
+  if(WVec.Pt()/1000. > 40) pass_pTW = true;
+  if( MT > 40) pass_MT = true;
+  if(WCRbJets.size() ==0) pass_zerobJet = true;
+  if(pass_onelep && pass_pTW && pass_MT && pass_zerobJet && pass_fatjet) pass_WCR = true;
+
+  //Zll CR
   
   //QCD CR1 
   //one extra jet point to MET
