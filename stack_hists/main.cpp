@@ -49,9 +49,9 @@ int main (int argc, char * argv[])
 	}
 
 	int file_num = (argc - 3) / 3;
-	//ttbar, singletop, Zvv, Wlv, diboson
-    int color[] = {kRed, kMagenta, kBlue, kCyan, kGreen, kRed+3};
-
+	//             ttbarall nonall, singletop,   Wlv(ev/muv/taumu),                   Zll,      Zvv         gamma   dijet  monoW monoH
+    int color[] = {kOrange, kOrange, kOrange - 1,kGreen - 9, kGreen - 9,kGreen - 9, kAzure + 2, kAzure - 4, kYellow, kCyan, kRed, kBlue};
+     
 	// set style for plots
 	SetAtlasStyle();
 
@@ -70,7 +70,13 @@ int main (int argc, char * argv[])
 	TIter next(first_hist_file->GetListOfKeys());
 	TKey * first_key;
     int pass(0); 
-	 
+    vector<double> norm;
+	
+	norm.reserve(100);
+	for(unsigned int i(0);i < norm.size();i++){
+		norm.at(i)=0;
+	}
+	
 	while (first_key = (TKey*) next())		
 	{   if(pass < 3)
 		{pass++; continue;}
@@ -108,29 +114,35 @@ int main (int argc, char * argv[])
 		int j = 0;
 		int passn(0);
 		while (key = (TKey*) next())
-		{   if(passn <3)
+		{   
+			if(passn <3)
 			{passn++; continue;}
 	
 		    std::cout << key->GetName() << std::endl;
 			// get a histogram
 			hists.push_back((TH1F*) hist_file->Get(key->GetName()));
 			hists.back()->SetLineColor(color[i]);
-			hists.back()->SetMarkerStyle(25);
-			hists.back()->SetMarkerColor(color[i]);
+			//hists.back()->SetMarkerStyle(25);
+			//hists.back()->SetMarkerColor(color[i]);
 			hists.back()->Sumw2(false);
 			// add histogram to one of the histogram stacks
 			if (atoi(argv[3 * i + 5]))
-			{
+			{	
+				
 				hists.back()->SetFillColor(color[i]);
 				hists.back()->SetFillStyle(1001);
-				//hists.back()->SetDefaultSumw2(kFALSE);
 				// add it to the stacked histograms
 				stacked_hists.at(j)->Add(hists.back());
+				//norm.at(j) += hists.back()->Integral();
 			}
 			else
 			{
 				// add it to the not stacked histograms
-				hists.back()->Scale(40);
+				//if( norm.at(j) ==0 ) hists.back()->Scale(1);
+				//else {
+				//	hists.back()->Scale(norm.at(j)/hists.back()->Integral());
+				//}
+				//hists.back()->Scale(40);
 				not_stacked_hists.at(j)->Add(hists.back());
 			}
 
@@ -152,7 +164,9 @@ int main (int argc, char * argv[])
 		{
 			maximum = not_stacked_hists.at(k)->GetMaximum("nostack");
 		}
-
+		
+		
+		
 		stacked_hists.at(k)->SetMaximum(maximum * 1.2);
 		not_stacked_hists.at(k)->SetMaximum(maximum * 1.2);
 
