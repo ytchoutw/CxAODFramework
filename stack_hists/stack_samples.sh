@@ -1,6 +1,6 @@
 #!/bin/bash
 
-BIN_DIR=/phys/groups/tev/scratch3/users/ytchou/monoWZ/mono-higgs-master/stack_hists
+BIN_DIR=/phys/groups/tev/scratch3/users/ytchou/monoWZ/CxAODFramework/stack_hists
 SAMPLE_DIR=/phys/groups/tev/scratch3/users/ytchou/monoWZ/CxAODFramework/Workdir_13TeV 
 
 mkdir stacked_plots
@@ -19,8 +19,8 @@ $SAMPLE_DIR/hist-Wtauv.root Wtauv 1 \
 $SAMPLE_DIR/hist-Zll.root Zll 1 \
 $SAMPLE_DIR/hist-Zvv.root Zvv 1 \
 $SAMPLE_DIR/hist-gamma.root gamma 1 \
-$SAMPLE_DIR/hist-dijet.root Zvv 1 \
-$SAMPLE_DIR/hist-monoWjjIsrConD5m50.root monoWjjIsrConD5m50x40 0 \
+$SAMPLE_DIR/hist-dijet.root dijet 1 \
+#$SAMPLE_DIR/hist-monoWjjIsrConD5m50.root monoWjjIsrConD5m50x40 0 \
 
 
 cd ..

@@ -71,10 +71,9 @@ int main (int argc, char * argv[])
 	TKey * first_key;
     int pass(0); 
     vector<double> norm;
-	
-	norm.reserve(100);
-	for(unsigned int i(0);i < norm.size();i++){
-		norm.at(i)=0;
+
+	for(unsigned int i(0);i < 100;i++){
+		norm.push_back(0);
 	}
 	
 	while (first_key = (TKey*) next())		
@@ -133,17 +132,17 @@ int main (int argc, char * argv[])
 				hists.back()->SetFillStyle(1001);
 				// add it to the stacked histograms
 				stacked_hists.at(j)->Add(hists.back());
-				//norm.at(j) += hists.back()->Integral();
+				norm.at(j) += hists.back()->Integral();
 			}
 			else
 			{
-				// add it to the not stacked histograms
-				//if( norm.at(j) ==0 ) hists.back()->Scale(1);
-				//else {
-				//	hists.back()->Scale(norm.at(j)/hists.back()->Integral());
-				//}
+				/*// add it to the not stacked histograms
+				if( norm.at(j) ==0 ) hists.back()->Scale(1);
+				else {
+					hists.back()->Scale(norm.at(j)/hists.back()->Integral());
+				}
 				//hists.back()->Scale(40);
-				not_stacked_hists.at(j)->Add(hists.back());
+				not_stacked_hists.at(j)->Add(hists.back());*/
 			}
 
 			// add it to the legend
@@ -152,6 +151,59 @@ int main (int argc, char * argv[])
 		}
 	} 
 
+	
+	for (int i = 0; i < file_num; i++)
+	{
+		// hist file
+		TFile * hist_file = new TFile(argv[3 * i + 3]);
+        
+		// histograms
+		vector<TH1F*> hists;
+		hists.reserve(100);
+
+		// iterate over keys
+		TIter next(hist_file->GetListOfKeys());
+		TKey * key;
+
+		int j = 0;
+		int passn(0);
+		while (key = (TKey*) next())
+		{   
+			if(passn <3)
+			{passn++; continue;}
+	
+		    std::cout << key->GetName() << std::endl;
+			// get a histogram
+			hists.push_back((TH1F*) hist_file->Get(key->GetName()));
+			hists.back()->SetLineColor(color[i]);
+			//hists.back()->SetMarkerStyle(25);
+			//hists.back()->SetMarkerColor(color[i]);
+			hists.back()->Sumw2(false);
+			// add histogram to one of the histogram stacks
+			if (atoi(argv[3 * i + 5]))
+			{	
+				
+				/*hists.back()->SetFillColor(color[i]);
+				hists.back()->SetFillStyle(1001);
+				// add it to the stacked histograms
+				stacked_hists.at(j)->Add(hists.back());
+				norm.at(j) += hists.back()->Integral();*/
+			}
+			else
+			{
+				// add it to the not stacked histograms
+				//if( norm.at(j) ==0 ) hists.back()->Scale(1);
+				hists.back()->Scale(norm.at(j)/hists.back()->Integral());
+				//hists.back()->Scale(40);
+				not_stacked_hists.at(j)->Add(hists.back());
+			}
+
+			// add it to the legend
+			//legends.at(j)->AddEntry(hists.back(), argv[3 * i + 4], "l");
+            j++;
+		}
+	} 	
+	
 	// canvas for histogram eps files
 	TCanvas * c1 = new TCanvas("c1", "c1", 640, 480);
     
