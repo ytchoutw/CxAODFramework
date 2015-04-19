@@ -86,7 +86,6 @@ public:
   float m_SherpaPt0VJetsCut; //! cut Pt0 events overlapping with other PtV slices
   
   
-  //  TH1F* m_hist_0lep_; //!
   //monoWZH hists
   //pre-selection
   TH1F* m_hist_mono_pre_MET; //!
@@ -107,13 +106,39 @@ public:
   TH1F* m_hist_mono_cutflow_mj_MET; //!
   TH1F* m_hist_mono_cutflow_Nsigfjet; //!
   TH1F* m_hist_mono_cutflow_fjetaddjetDeltaR; //!
-    //monoWZH n-1
-  TH1F* m_hist_nminusone_fjet; //!
+  //monoWZH n-1
+  TH1F* m_hist_nminusone_nfjet; //!
+  TH1F* m_hist_nminusone_ptfjet; //!
+  TH1F* m_hist_nminusone_mfjet; //!
+  TH1F* m_hist_nminusone_etafjet; //!
   TH1F* m_hist_nminusone_jetveto; //!
   TH1F* m_hist_nminusone_met; //!
   TH1F* m_hist_nminusone_mj; //!
-  TH1F* m_hist_mono_eff_MET; //!
   TH1F* m_hist_nminusone_phi; //!
+  TH1F* m_hist_nminusone_ndRjfjet; //!
+  TH1F* m_hist_nminusone_ndRBfjet; //!
+  //TH2D* m_hist_nminusone_PhiMETj; //!
+  //CR
+  TH1F* m_histW_ptW; //!
+  TH1F* m_histW_MT; //!
+  TH1F* m_histW_mfjet; //!
+  TH1F* m_histW_ptfjet; //!
+  
+  TH1F* m_histZl_ptZ; //!
+  TH1F* m_histZl_ptMETZ; //!
+  TH1F* m_histZl_mfjet; //!
+  TH1F* m_histZl_ptfjet; //!
+  
+  TH1F* m_histZv_ptfjet; //!
+  TH1F* m_histZv_mfjet; //!
+
+  TH1F* m_histtop_dPhiMETj; //!
+  TH1F* m_histtop_ptfjet; //!
+  TH1F* m_histtop_mfjet; //! 
+  
+  TH1F* m_histQCD_dPhiMETj; //!
+  TH1F* m_histQCD_ptfjet; //!
+  TH1F* m_histQCD_mfjet; //! 
   
   // 0 lep hists
   TH1F* m_hist2j_0lep_dRBB; //!
