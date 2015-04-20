@@ -414,20 +414,20 @@ EL::StatusCode AnalysisReader :: histInitialize_monoWZH()
   
   
   //n-1 histogram 
-  buffer = "AKt10Trimmed jet Multiplicity fatjet n-1"; nbins = 6; min = -0.5; max = 5.5 ;
-  m_hist_nminusone_nfjet = new TH1F(TString(buffer),"AKt10Trimmed jet Multiplicity fatjet n-1; Multiplicity_{fatjet}; Normalized Events",nbins, min, max);
+  buffer = "AKt10Trimmed jet Multiplicity onefatjet n-1"; nbins = 6; min = -0.5; max = 5.5 ;
+  m_hist_nminusone_nfjet = new TH1F(TString(buffer),"AKt10Trimmed jet Multiplicity onefatjet n-1; Multiplicity_{fatjet}; Normalized Events",nbins, min, max);
   wk()->addOutput(m_hist_nminusone_nfjet);
   
-  buffer = "p_{T,fatjet} fatjet n-1"; nbins = 24; min = 200. ;max = 800 ;
-  m_hist_nminusone_ptfjet = new TH1F(TString(buffer),"p_{T,fatjet} n-1;p_{T, fatjet} [GeV]; Normalized Events / 25 GeV",nbins, min, max);
+  buffer = "p_{T,fatjet} onefatjet n-1"; nbins = 40; min = 250. ;max = 1250 ;
+  m_hist_nminusone_ptfjet = new TH1F(TString(buffer),"p_{T,fatjet} onefatjet n-1;p_{T, fatjet} [GeV]; Normalized Events / 25 GeV",nbins, min, max);
   wk()->addOutput(m_hist_nminusone_ptfjet);
   
-  buffer = "Mass_{fatjet} fatjet n-1"; nbins = 10; min = 0. ;max = 250 ;
-  m_hist_nminusone_mfjet = new TH1F(TString(buffer),"Mass_{fatjet} n-1;Mass_{fatjet} [GeV]; Normalized Events / 25 GeV",nbins, min, max);
+  buffer = "Mass_{fatjet} onefatjet n-1"; nbins = 10; min = 0. ;max = 250 ;
+  m_hist_nminusone_mfjet = new TH1F(TString(buffer),"Mass_{fatjet} onefatjet n-1;Mass_{fatjet} [GeV]; Normalized Events / 25 GeV",nbins, min, max);
   wk()->addOutput(m_hist_nminusone_mfjet);
   
-  buffer = "#eta_{fatjet) fatjet n-1"; nbins = 10; min = -4.5 ;max = 4.5 ;
-  m_hist_nminusone_etafjet = new TH1F(TString(buffer),"#eta_{fatjet} n-1;#eta_{fatjet}; Normalized Events / 0.9 ",nbins, min, max);
+  buffer = "#eta_{fatjet} onefatjet n-1"; nbins = 10; min = -4.5 ;max = 4.5 ;
+  m_hist_nminusone_etafjet = new TH1F(TString(buffer),"#eta_{fatjet} onefatjet n-1;#eta_{fatjet}; Normalized Events / 0.9 ",nbins, min, max);
   wk()->addOutput(m_hist_nminusone_etafjet);
   
   buffer = "addjetveto n-1 sig addjet Multiplicity"; nbins = 10; min = -0.5; max = 9.5 ;
@@ -448,65 +448,202 @@ EL::StatusCode AnalysisReader :: histInitialize_monoWZH()
 
   //CR
   //W CR
-  buffer = "W CR:  p_{T,W}"; nbins = 28; min = 50.; max = 750. ;
-  m_histW_ptW = new TH1F(TString(buffer),"W CR: p_{T,W} ; p_{T,W} [GeV]; Normalized Events / 25 GeV",nbins, min, max);
-  wk()->addOutput(m_histW_ptW);    
+  //CR e
+  buffer = "W CR e:  p_{T,W}"; nbins = 28; min = 50.; max = 750. ;
+  m_histWe_ptW = new TH1F(TString(buffer),"W CR e: p_{T,W} ; p_{T,W} [GeV]; Normalized Events / 25 GeV",nbins, min, max);
+  wk()->addOutput(m_histWe_ptW);    
   
-  buffer = "W CR:  M_{T,lep}"; nbins = 40; min = 0.; max = 400. ;
-  m_histW_MT = new TH1F(TString(buffer),"W CR: M_{T,lep} ; M_{T,lep} [GeV]; Normalized Events / 10 GeV",nbins, min, max);
-  wk()->addOutput(m_histW_MT);    
+  buffer = "W CR e:  M_{T,lep}"; nbins = 40; min = 0.; max = 400. ;
+  m_histWe_MT = new TH1F(TString(buffer),"W CR e: M_{T,lep} ; M_{T,lep} [GeV]; Normalized Events / 10 GeV",nbins, min, max);
+  wk()->addOutput(m_histWe_MT);    
 	
-  buffer = "W CR:  Mass_{fatjet}"; nbins = 25; min = 0.; max = 250. ;
-  m_histW_mfjet = new TH1F(TString(buffer),"W CR: Mass_{fatjet} ; Mass_{fatjet} [GeV]; Normalized Events / 10 GeV",nbins, min, max);
-  wk()->addOutput(m_histW_mfjet);     	
+  buffer = "W CR e:  Mass_{fatjet}"; nbins = 25; min = 0.; max = 250. ;
+  m_histWe_mfjet = new TH1F(TString(buffer),"W CR e: Mass_{fatjet} ; Mass_{fatjet} [GeV]; Normalized Events / 10 GeV",nbins, min, max);
+  wk()->addOutput(m_histWe_mfjet);     	
   
-  buffer = "W CR: p_{T,fatjet} fatjet "; nbins = 20; min = 250.; max = 750 ;
-  m_histW_ptfjet = new TH1F(TString(buffer),"W CR: p_{T,fatjet} ;p_{T, fatjet} [GeV]; Normalized Events / 25 GeV",nbins, min, max);
-  wk()->addOutput(m_histW_ptfjet);  
+  buffer = "W CR e: p_{T,fatjet}  "; nbins = 20; min = 250.; max = 750 ;
+  m_histWe_ptfjet = new TH1F(TString(buffer),"W CR e: p_{T,fatjet} ;p_{T, fatjet} [GeV]; Normalized Events / 25 GeV",nbins, min, max);
+  wk()->addOutput(m_histWe_ptfjet);  
+  
+  buffer = "W CR e: #eta_{fatjet}"; nbins = 24; min = 0 ;max = 1.2 ;
+  m_histWe_etafjet = new TH1F(TString(buffer),"W CR e: #eta_{fatjet};#eta_{fatjet}; Normalized Events / 0.05 ",nbins, min, max);
+  wk()->addOutput(m_histWe_etafjet);  
+  
+  buffer = "W CR e: AKt4 b-jet Multiplicity"; nbins = 6; min = -0.5; max = 5.5 ;
+  m_histWe_nB = new TH1F(TString(buffer),"W CR e: AKt4 b-jet Multiplicity; Multiplicity_{AKt4 b-jet}; Normalized Events",nbins, min, max);
+  wk()->addOutput(m_histWe_nB);  
+  
+  //CR mu
+  buffer = "W CR #mu: p_{T,W}"; nbins = 28; min = 50.; max = 750. ;
+  m_histWmu_ptW = new TH1F(TString(buffer),"W CR #mu: p_{T,W} ; p_{T,W} [GeV]; Normalized Events / 25 GeV",nbins, min, max);
+  wk()->addOutput(m_histWmu_ptW);    
+  
+  buffer = "W CR #mu: M_{T,lep}"; nbins = 40; min = 0.; max = 400. ;
+  m_histWmu_MT = new TH1F(TString(buffer),"W CR #mu: M_{T,lep} ; M_{T,lep} [GeV]; Normalized Events / 10 GeV",nbins, min, max);
+  wk()->addOutput(m_histWmu_MT);    
+	
+  buffer = "W CR #mu: Mass_{fatjet}"; nbins = 25; min = 0.; max = 250. ;
+  m_histWmu_mfjet = new TH1F(TString(buffer),"W CR #mu: Mass_{fatjet} ; Mass_{fatjet} [GeV]; Normalized Events / 10 GeV",nbins, min, max);
+  wk()->addOutput(m_histWmu_mfjet);     	
+  
+  buffer = "W CR #mu: p_{T,fatjet}  "; nbins = 20; min = 250.; max = 750 ;
+  m_histWmu_ptfjet = new TH1F(TString(buffer),"W CR #mu: p_{T,fatjet} ;p_{T, fatjet} [GeV]; Normalized Events / 25 GeV",nbins, min, max);
+  wk()->addOutput(m_histWmu_ptfjet);    
+
+  buffer = "W CR #mu: #eta_{fatjet}"; nbins = 24; min = 0 ;max = 1.2 ;
+  m_histWmu_etafjet = new TH1F(TString(buffer),"W CR #mu: #eta_{fatjet};#eta_{fatjet}; Normalized Events / 0.05 ",nbins, min, max);
+  wk()->addOutput(m_histWmu_etafjet);    
+  
+  buffer = "W CR #mu: AKt4 b-jet Multiplicity"; nbins = 6; min = -0.5; max = 5.5 ;
+  m_histWmu_nB = new TH1F(TString(buffer),"W CR #mu: AKt4 b-jet Multiplicity; Multiplicity_{AKt4 b-jet}; Normalized Events",nbins, min, max);
+  wk()->addOutput(m_histWmu_nB);    
+  
   //Zll CR  
-  buffer = "Zll CR:  p_{T,Z}"; nbins = 25; min = 250.; max = 750. ;
-  m_histZl_ptZ = new TH1F(TString(buffer),"Zll CR: p_{T,Z} ; p_{T,Z} [GeV]; Normalized Events / 20 GeV",nbins, min, max);
-  wk()->addOutput(m_histZl_ptZ);      
+  buffer = "Zll CR e:  p_{T,Z}"; nbins = 25; min = 250.; max = 750. ;
+  m_histZle_ptZ = new TH1F(TString(buffer),"Zll CR e: p_{T,Z} ; p_{T,Z} [GeV]; Normalized Events / 20 GeV",nbins, min, max);
+  wk()->addOutput(m_histZle_ptZ);      
   
-  buffer = "Zll CR:  Mass_{fatjet}"; nbins = 25; min = 0.; max = 250. ;
-  m_histZl_mfjet = new TH1F(TString(buffer),"Zll CR: Mass_{fatjet} ; Mass_{fatjet} [GeV]; Normalized Events / 10 GeV",nbins, min, max);
-  wk()->addOutput(m_histZl_mfjet);     	
+  buffer = "Zll CR e:  Mass_{fatjet}"; nbins = 25; min = 0.; max = 250. ;
+  m_histZle_mfjet = new TH1F(TString(buffer),"Zll CR e: Mass_{fatjet} ; Mass_{fatjet} [GeV]; Normalized Events / 10 GeV",nbins, min, max);
+  wk()->addOutput(m_histZle_mfjet);     	
   
-  buffer = "Zll CR: p_{T,fatjet} fatjet "; nbins = 20; min = 250. ;max = 750 ;
-  m_histZl_ptfjet = new TH1F(TString(buffer),"Zll CR: p_{T,fatjet} ;p_{T, fatjet} [GeV]; Normalized Events / 25 GeV",nbins, min, max);
-  wk()->addOutput(m_histZl_ptfjet);  
+  buffer = "Zll CR e: p_{T,fatjet} fatjet "; nbins = 20; min = 250. ;max = 750 ;
+  m_histZle_ptfjet = new TH1F(TString(buffer),"Zll CR e: p_{T,fatjet} ;p_{T, fatjet} [GeV]; Normalized Events / 25 GeV",nbins, min, max);
+  wk()->addOutput(m_histZle_ptfjet);  
+  
+  buffer = "Zll CR e: #eta_{fatjet}"; nbins = 24; min = 0 ;max = 1.2 ;
+  m_histZle_etafjet = new TH1F(TString(buffer),"Zll CR e: #eta_{fatjet};#eta_{fatjet}; Normalized Events / 0.05 ",nbins, min, max);
+  wk()->addOutput(m_histZle_etafjet);    
+  
+  buffer = "Zll CR e: AKt4 b-jet Multiplicity"; nbins = 6; min = -0.5; max = 5.5 ;
+  m_histZle_nB = new TH1F(TString(buffer),"Zll CR e: AKt4 b-jet Multiplicity; Multiplicity_{AKt4 b-jet}; Normalized Events",nbins, min, max);
+  wk()->addOutput(m_histZle_nB);   
+
+  buffer = "Zll CR e:  Mass_{ll}"; nbins = 25; min = 0.; max = 250. ;
+  m_histZle_mll = new TH1F(TString(buffer),"Zll CR e: Mass_{ll} ; Mass_{ll} [GeV]; Normalized Events / 10 GeV",nbins, min, max);
+  wk()->addOutput(m_histZle_mll);    
+  
+  //CR mu
+  buffer = "Zll CR #mu:  p_{T,Z}"; nbins = 25; min = 250.; max = 750. ;
+  m_histZlmu_ptZ = new TH1F(TString(buffer),"Zll CR #mu: p_{T,Z} ; p_{T,Z} [GeV]; Normalized Events / 20 GeV",nbins, min, max);
+  wk()->addOutput(m_histZlmu_ptZ);      
+  
+  buffer = "Zll CR #mu:  Mass_{fatjet}"; nbins = 25; min = 0.; max = 250. ;
+  m_histZlmu_mfjet = new TH1F(TString(buffer),"Zll CR #mu: Mass_{fatjet} ; Mass_{fatjet} [GeV]; Normalized Events / 10 GeV",nbins, min, max);
+  wk()->addOutput(m_histZlmu_mfjet);     	
+  
+  buffer = "Zll CR #mu: p_{T,fatjet} fatjet "; nbins = 20; min = 250. ;max = 750 ;
+  m_histZlmu_ptfjet = new TH1F(TString(buffer),"Zll CR #mu: p_{T,fatjet} ;p_{T, fatjet} [GeV]; Normalized Events / 25 GeV",nbins, min, max);
+  wk()->addOutput(m_histZlmu_ptfjet);  
+  
+  buffer = "Zll CR #mu: #eta_{fatjet}"; nbins = 24; min = 0 ;max = 1.2 ;
+  m_histZlmu_etafjet = new TH1F(TString(buffer),"Zll CR #mu: #eta_{fatjet};#eta_{fatjet}; Normalized Events / 0.05 ",nbins, min, max);
+  wk()->addOutput(m_histZlmu_etafjet);    
+  
+  buffer = "Zll CR #mu: AKt4 b-jet Multiplicity"; nbins = 6; min = -0.5; max = 5.5 ;
+  m_histZlmu_nB = new TH1F(TString(buffer),"Zll CR #mu: AKt4 b-jet Multiplicity; Multiplicity_{AKt4 b-jet}; Normalized Events",nbins, min, max);
+  wk()->addOutput(m_histZlmu_nB);    
+  
+  buffer = "Zll CR #mu:  Mass_{ll}"; nbins = 25; min = 0.; max = 250. ;
+  m_histZlmu_mll = new TH1F(TString(buffer),"Zll CR #mu: Mass_{ll} ; Mass_{ll} [GeV]; Normalized Events / 10 GeV",nbins, min, max);
+  wk()->addOutput(m_histZlmu_mll);      
+  
   //Zvv CR
-  buffer = "Zvv CR:  Mass_{fatjet}"; nbins = 25; min = 0.; max = 250. ;
+  buffer = "Zvv CR: Mass_{fatjet}"; nbins = 25; min = 0.; max = 250. ;
   m_histZv_mfjet = new TH1F(TString(buffer),"Zvv CR: Mass_{fatjet} ; Mass_{fatjet} [GeV]; Normalized Events / 10 GeV",nbins, min, max);
   wk()->addOutput(m_histZv_mfjet);     	
   
   buffer = "Zvv CR: p_{T,fatjet} fatjet "; nbins = 10; min = 250. ;max = 750 ;
   m_histZv_ptfjet = new TH1F(TString(buffer),"Zvv CR: p_{T,fatjet} ;p_{T, fatjet} [GeV]; Normalized Events / 50 GeV",nbins, min, max);
   wk()->addOutput(m_histZv_ptfjet);  
+  
+  buffer = "Zvv CR: #eta_{fatjet}"; nbins = 24; min = 0 ;max = 1.2 ;
+  m_histZv_etafjet = new TH1F(TString(buffer),"Zvv CR: #eta_{fatjet};#eta_{fatjet}; Normalized Events / 0.05 ",nbins, min, max);
+  wk()->addOutput(m_histZv_etafjet);    
+  
+  buffer = "Zvv CR: E_{T}^{Miss}"; nbins = 20; min = 100.; max = 1100. ;
+  m_histZv_MET = new TH1F(TString(buffer),"Zvv CR: E_{T}^{Miss}; E_{T}^{Miss} [GeV]; Normalized Events / 50 GeV",nbins, min, max);
+  wk()->addOutput(m_histZv_MET);    
+  
+  buffer = "Zvv CR: AKt4 b-jet Multiplicity"; nbins = 6; min = -0.5; max = 5.5 ;
+  m_histZv_nB = new TH1F(TString(buffer),"Zvv CR: AKt4 b-jet Multiplicity; Multiplicity_{AKt4 b-jet}; Normalized Events",nbins, min, max);
+  wk()->addOutput(m_histZv_nB);       
+  
+  
   //Top CR  
-  buffer = "Top CR: #Delta#phi(MET,AKt4 jets) "; nbins = 10; min = 0; max = 1;
-  m_histtop_dPhiMETj = new TH1F(TString(buffer),"Top CR: #Delta#phi(MET,AKt4 jets) ; #Delta#phi(MET,AKt4 jets); Normalized Events/ 0.1",nbins, min, max);
-  wk()->addOutput(m_histtop_dPhiMETj);
+  buffer = "Top CR e: #Delta#phi(MET,AKt4 jets) "; nbins = 10; min = 0; max = 1;
+  m_histtope_dPhiMETj = new TH1F(TString(buffer),"Top CR e: #Delta#phi(MET,AKt4 jets) ; #Delta#phi(MET,AKt4 jets); Normalized Events/ 0.1",nbins, min, max);
+  wk()->addOutput(m_histtope_dPhiMETj);
   
-  buffer = "Top CR:  Mass_{fatjet}"; nbins = 25; min = 0.; max = 250. ;
-  m_histtop_mfjet = new TH1F(TString(buffer),"Top CR: Mass_{fatjet} ; Mass_{fatjet} [GeV]; Normalized Events / 10 GeV",nbins, min, max);
-  wk()->addOutput(m_histtop_mfjet);     	
+  buffer = "Top CR e:  Mass_{fatjet}"; nbins = 25; min = 0.; max = 250. ;
+  m_histtope_mfjet = new TH1F(TString(buffer),"Top CR e: Mass_{fatjet} ; Mass_{fatjet} [GeV]; Normalized Events / 10 GeV",nbins, min, max);
+  wk()->addOutput(m_histtope_mfjet);     	
   
-  buffer = "Top CR: p_{T,fatjet} fatjet "; nbins = 20; min = 250. ;max = 750 ;
-  m_histtop_ptfjet = new TH1F(TString(buffer),"Top CR: p_{T,fatjet} ;p_{T, fatjet} [GeV]; Normalized Events / 25 GeV",nbins, min, max);
-  wk()->addOutput(m_histtop_ptfjet);  
+  buffer = "Top CR e: p_{T,fatjet} fatjet "; nbins = 20; min = 250. ;max = 750 ;
+  m_histtope_ptfjet = new TH1F(TString(buffer),"Top CR e: p_{T,fatjet} ;p_{T, fatjet} [GeV]; Normalized Events / 25 GeV",nbins, min, max);
+  wk()->addOutput(m_histtope_ptfjet); 
+
+  buffer = "Top CR e: #eta_{fatjet}"; nbins = 24; min = 0 ;max = 1.2 ;
+  m_histtope_etafjet = new TH1F(TString(buffer),"Top CR e: #eta_{fatjet};#eta_{fatjet}; Normalized Events / 0.05 ",nbins, min, max);
+  wk()->addOutput(m_histtope_etafjet);    
+  
+  buffer = "Top CR e: E_{T}^{Miss}"; nbins = 20; min = 200.; max = 1200. ;
+  m_histtope_MET = new TH1F(TString(buffer),"Top CR e: E_{T}^{Miss}; E_{T}^{Miss} [GeV]; Normalized Events / 50 GeV",nbins, min, max);
+  wk()->addOutput(m_histtope_MET);    
+  
+  buffer = "Top CR e: AKt4 b-jet Multiplicity"; nbins = 6; min = -0.5; max = 5.5 ;
+  m_histtope_nB = new TH1F(TString(buffer),"Top CR e: AKt4 b-jet Multiplicity; Multiplicity_{AKt4 b-jet}; Normalized Events",nbins, min, max);
+  wk()->addOutput(m_histtope_nB);       
+  //Top mu 
+  buffer = "Top CR e: #Delta#phi(MET,AKt4 jets) "; nbins = 10; min = 0; max = 1;
+  m_histtopmu_dPhiMETj = new TH1F(TString(buffer),"Top CR e: #Delta#phi(MET,AKt4 jets) ; #Delta#phi(MET,AKt4 jets); Normalized Events/ 0.1",nbins, min, max);
+  wk()->addOutput(m_histtopmu_dPhiMETj);
+  
+  buffer = "Top CR #mu:  Mass_{fatjet}"; nbins = 25; min = 0.; max = 250. ;
+  m_histtopmu_mfjet = new TH1F(TString(buffer),"Top CR #mu: Mass_{fatjet} ; Mass_{fatjet} [GeV]; Normalized Events / 10 GeV",nbins, min, max);
+  wk()->addOutput(m_histtopmu_mfjet);     	
+  
+  buffer = "Top CR #mu: p_{T,fatjet} fatjet "; nbins = 20; min = 250. ;max = 750 ;
+  m_histtopmu_ptfjet = new TH1F(TString(buffer),"Top CR #mu: p_{T,fatjet} ;p_{T, fatjet} [GeV]; Normalized Events / 25 GeV",nbins, min, max);
+  wk()->addOutput(m_histtopmu_ptfjet); 
+
+  buffer = "Top CR #mu: #eta_{fatjet}"; nbins = 24; min = 0 ;max = 1.2 ;
+  m_histtopmu_etafjet = new TH1F(TString(buffer),"Top CR #mu: #eta_{fatjet};#eta_{fatjet}; Normalized Events / 0.05 ",nbins, min, max);
+  wk()->addOutput(m_histtopmu_etafjet);    
+  
+  buffer = "Top CR #mu: E_{T}^{Miss}"; nbins = 20; min = 200.; max = 1200. ;
+  m_histtopmu_MET = new TH1F(TString(buffer),"Top CR #mu: E_{T}^{Miss}; E_{T}^{Miss} [GeV]; Normalized Events / 50 GeV",nbins, min, max);
+  wk()->addOutput(m_histtopmu_MET);    
+  
+  buffer = "Top CR #mu: AKt4 b-jet Multiplicity"; nbins = 6; min = -0.5; max = 5.5 ;
+  m_histtopmu_nB = new TH1F(TString(buffer),"Top CR #mu: AKt4 b-jet Multiplicity; Multiplicity_{AKt4 b-jet}; Normalized Events",nbins, min, max);
+  wk()->addOutput(m_histtopmu_nB);      
+  
   //QCD CR 
   buffer = "QCD CR: #Delta#phi(MET,AKt4 jet) "; nbins = 16; min = 0; max = 0.4;
   m_histQCD_dPhiMETj = new TH1F(TString(buffer),"QCD CR: #Delta#phi(MET,AKt4 jets) ; #Delta#phi(MET,AKt4 jets); Normalized Events / 0.025",nbins, min, max);
   wk()->addOutput(m_histQCD_dPhiMETj);
   
-  buffer = "QCD CR:  Mass_{fatjet}"; nbins = 25; min = 0.; max = 250. ;
+  buffer = "QCD CR: Mass_{fatjet}"; nbins = 25; min = 0.; max = 250. ;
   m_histQCD_mfjet = new TH1F(TString(buffer),"QCD CR: Mass_{fatjet} ; Mass_{fatjet} [GeV]; Normalized Events / 10 GeV",nbins, min, max);
   wk()->addOutput(m_histQCD_mfjet);     	
   
   buffer = "QCD CR: p_{T,fatjet} fatjet "; nbins = 10; min = 250. ;max = 750 ;
   m_histQCD_ptfjet = new TH1F(TString(buffer),"QCD CR: p_{T,fatjet} ;p_{T, fatjet} [GeV]; Normalized Events / 50 GeV",nbins, min, max);
-  wk()->addOutput(m_histQCD_ptfjet);    
+  wk()->addOutput(m_histQCD_ptfjet); 
+  
+  buffer = "QCD CR: #eta_{fatjet}"; nbins = 24; min = 0 ;max = 1.2 ;
+  m_histQCD_etafjet = new TH1F(TString(buffer),"QCD CR: #eta_{fatjet};#eta_{fatjet}; Normalized Events / 0.05 ",nbins, min, max);
+  wk()->addOutput(m_histQCD_etafjet);    
+  
+  buffer = "QCD CR: E_{T}^{Miss}"; nbins = 20; min = 200.; max = 1200. ;
+  m_histQCD_MET = new TH1F(TString(buffer),"QCD CR: E_{T}^{Miss}; E_{T}^{Miss} [GeV]; Normalized Events / 50 GeV",nbins, min, max);
+  wk()->addOutput(m_histQCD_MET);    
+  
+  buffer = "QCD CR: AKt4 b-jet Multiplicity"; nbins = 6; min = -0.5; max = 5.5 ;
+  m_histQCD_nB = new TH1F(TString(buffer),"QCD CR: AKt4 b-jet Multiplicity; Multiplicity_{AKt4 b-jet}; Normalized Events",nbins, min, max);
+  wk()->addOutput(m_histQCD_nB);    
+  
   
   return EL::StatusCode::SUCCESS;
 }
@@ -1516,11 +1653,25 @@ if(pass_presele)
   
   //Fill W CR histogram
   if(pass_WCR){
-	m_histW_ptW->Fill(WVec.Pt()/1000. ,m_weight);  
-	m_histW_MT->Fill(MT, m_weight);
-	for(unsigned int i(0);i < fatsigJets.size();i++){
-		m_histW_mfjet->Fill(fatsigJets.at(i)->m()/1000., m_weight);
-		m_histW_ptfjet->Fill(fatsigJets.at(i)->pt()/1000., m_weight);
+	if(oneElec){
+		m_histWe_ptW->Fill(WVec.Pt()/1000. ,m_weight);  
+		m_histWe_MT->Fill(MT, m_weight);
+		m_histWe_nB->Fill(CRbJets.size(), m_weight);
+		for(unsigned int i(0);i < fatsigJets.size();i++){
+			m_histWe_mfjet->Fill(fatsigJets.at(i)->m()/1000., m_weight);
+			m_histWe_ptfjet->Fill(fatsigJets.at(i)->pt()/1000., m_weight);	
+			m_histWe_etafjet->Fill(fabs(fatsigJets.at(i)->eta()), m_weight);	
+		}
+	}
+	if(oneMuon)	{
+		m_histWmu_ptW->Fill(WVec.Pt()/1000. ,m_weight);  
+		m_histWmu_MT->Fill(MT, m_weight);
+		m_histWmu_nB->Fill(CRbJets.size(), m_weight);
+		for(unsigned int i(0);i < fatsigJets.size();i++){
+			m_histWmu_mfjet->Fill(fatsigJets.at(i)->m()/1000., m_weight);
+			m_histWmu_ptfjet->Fill(fatsigJets.at(i)->pt()/1000., m_weight);
+			m_histWmu_etafjet->Fill(fabs(fatsigJets.at(i)->eta()), m_weight);	
+		}
 	}
   }
   
@@ -1534,6 +1685,7 @@ if(pass_presele)
   bool twoElecs = false;
   bool twoMuons = false;
   bool pass_iso = false;
+  bool pass_Zmass = false;
   
   std::vector<const xAOD::Electron*> CRElectrons;
   std::vector<const xAOD::Muon*> CRMuons;  
@@ -1593,34 +1745,62 @@ if(pass_presele)
   if(twolep){
 	Zvec = lepvec1 + lepvec2;
   }
-  
-  if(pass_fatjet && pass_zerobJet && twolep && pass_iso) pass_ZlCR = true;
+  double Zmass;
+  Zmass = Zvec.M()/1000.;
+  if( Zmass > 75 && Zmass < 105 ) pass_Zmass = true;
+  if(pass_fatjet && pass_zerobJet && twolep && pass_iso && pass_Zmass) pass_ZlCR = true;
   
 
   if(pass_ZlCR){
-	//To do: add ptZ ptMETZ hist Fill
-	m_histZl_ptZ->Fill(Zvec.Pt()/1000., m_weight);
-	for(unsigned int i(0);i < fatsigJets.size();i++){
-		m_histZl_mfjet->Fill(fatsigJets.at(i)->m()/1000., m_weight);
-		m_histZl_ptfjet->Fill(fatsigJets.at(i)->pt()/1000., m_weight);
-	}  
+	if(twoElecs){
+		//To do: add ptMETZ(?) hist Fill
+		m_histZle_ptZ->Fill(Zvec.Pt()/1000., m_weight);
+		m_histZle_mll->Fill(Zmass, m_weight);
+		m_histZle_nB->Fill(CRbJets.size(),m_weight);
+		for(unsigned int i(0);i < fatsigJets.size();i++){
+		m_histZle_mfjet->Fill(fatsigJets.at(i)->m()/1000., m_weight);
+		m_histZle_ptfjet->Fill(fatsigJets.at(i)->pt()/1000., m_weight);
+		m_histZle_etafjet->Fill(fabs(fatsigJets.at(i)->eta()), m_weight);
+		}  
+	}
+	if(twoMuons){
+		m_histZlmu_ptZ->Fill(Zvec.Pt()/1000., m_weight);
+		m_histZlmu_mll->Fill(Zmass, m_weight);
+		m_histZlmu_nB->Fill(CRbJets.size(),m_weight);
+		for(unsigned int i(0);i < fatsigJets.size();i++){
+		m_histZlmu_mfjet->Fill(fatsigJets.at(i)->m()/1000., m_weight);
+		m_histZlmu_ptfjet->Fill(fatsigJets.at(i)->pt()/1000., m_weight);
+		m_histZlmu_etafjet->Fill(fabs(fatsigJets.at(i)->eta()), m_weight);
+		}  	
+	}
   }
   
   //Zvv CR
   //no el,mu
   //1 fanjet with pT>250GeV and |eta|<1.2
-  //MET>200GeV
+  //MET>100GeV
   //min dPhi(Met, akt4)>0.4
   bool pass_ZvCR = false;
-  bool pass_200met = false;
-  if(met->met()/1000. > 200.) pass_200met = true;
-  if( pass_noelectron && pass_nomuon && pass_fatjet && pass_200met && pass_phimetjet) pass_ZvCR = true;
+  bool pass_100met = false;
+  bool ZvCRPhi =false;
+  double minPhiZv = 10;
+  if(met->met()/1000. > 100.) pass_100met = true;
+  for(unsigned int iJet(0);iJet <sigJets.size(); iJet++){
+	TLorentzVector jetvec;
+	jetvec.SetPtEtaPhiM(sigJets.at(iJet)->pt(), sigJets.at(iJet)->eta(), sigJets.at(iJet)->phi(), sigJets.at(iJet)->m());
+	if(fabs(jetvec.DeltaPhi(metVec)) < minPhiZv) minPhiZv = fabs(jetvec.DeltaPhi(metVec));	
+  }
+  if(minPhiZv > 0.4)ZvCRPhi =true;
+  if( pass_noelectron && pass_nomuon && pass_fatjet && pass_100met && ZvCRPhi) pass_ZvCR = true;
 
   //Fill Zvv hists
   if(pass_ZvCR){
+	m_histZv_nB->Fill(CRbJets.size(),m_weight);
+	m_histZv_MET->Fill(met->met()/1000., m_weight);
 	for(unsigned int i(0);i < fatsigJets.size();i++){
 		m_histZv_mfjet->Fill(fatsigJets.at(i)->m()/1000., m_weight);
 		m_histZv_ptfjet->Fill(fatsigJets.at(i)->pt()/1000., m_weight);
+		m_histZv_etafjet->Fill(fabs(fatsigJets.at(i)->eta()), m_weight);
 	}  
 	
   }
@@ -1630,44 +1810,88 @@ if(pass_presele)
   //1 fanjet with pT>250GeV and |eta|<1.2
   //N b-tagged akt4jet >=1
   //min dR(lep, b-tagged akt4 jet)<1.5
+  /*    Please modify the min dR(lep, bakt4)<1.5  selection to:
+     - min dR(lep, akt4) <1.5
+     - N(b-tagged akt4 jets with dR(fatjet, b-tagged akt4)<1.0) >=1    
+   * Show the N-1 b-jet multiplicity distribution.*/
+   
   bool pass_TopCR = false;
   bool pass_nB = false;
   bool pass_minR = false;
+  
+  std::vector<const xAOD::Jet*> TopCRbJets;
+  std::vector<const xAOD::Jet*> TopCRJets;
   double minR = 999;
-  if(CRbJets.size() > 0) pass_nB = true ; 
+  
  if(pass_onelep){
 	TLorentzVector lep; 
 	
 	if(oneElec) lep.SetPtEtaPhiM(selElectrons.at(0)->pt(), selElectrons.at(0)->eta(), selElectrons.at(0)->phi(), selElectrons.at(0)->m());
 	if(oneMuon) lep.SetPtEtaPhiM(selMuons.at(0)->pt(), selMuons.at(0)->eta(), selMuons.at(0)->phi(), selMuons.at(0)->m());
-	for(unsigned int iJet(0);iJet < CRbJets.size() ;iJet++){
+	for(unsigned int iJet(0);iJet < sigJets.size() ;iJet++){
+		const xAOD::Jet* Jet = sigJets.at(iJet);
 		TLorentzVector jetvec;
-		if( minR > jetvec.DeltaR(lep)) minR = jetvec.DeltaR(lep);			
+		jetvec.SetPtEtaPhiM(Jet->pt(), Jet->eta(), Jet->phi(), Jet->m());		
+		if( minR > jetvec.DeltaR(lep)) minR = jetvec.DeltaR(lep);	
+		TopCRJets.push_back(Jet);
+		if(!(m_superDecorator.get(Jet, JetFloatProps::MV1) > 0.971966))  continue; // 70% operation point 
+		if(!(jetvec.DeltaR(fjet) < 1.))continue;
+		TopCRbJets.push_back(Jet);		
 	}
 		
   }
+  
   if(minR < 1.5) pass_minR = true;
+  if(TopCRbJets.size() > 0) pass_nB = true ; 
+  
   if(pass_onelep && pass_fatjet && pass_nB && pass_minR ) pass_TopCR = true;
+  
+  if(pass_onelep && pass_fatjet && pass_minR )  {
+	if(oneElec)	m_histtope_nB->Fill(TopCRbJets.size(), m_weight);
+	if(oneMuon)	m_histtopmu_nB->Fill(TopCRbJets.size(), m_weight);
+  }
+	  
+  
   if(pass_TopCR){
-	m_histtop_dPhiMETj->Fill(minPhi, m_weight);  
-	for(unsigned int i(0);i < fatsigJets.size();i++){
-		m_histtop_mfjet->Fill(fatsigJets.at(i)->m()/1000., m_weight);
-		m_histtop_ptfjet->Fill(fatsigJets.at(i)->pt()/1000., m_weight);
+	if(oneElec){
+		m_histtope_dPhiMETj->Fill(minPhiZv, m_weight);  //?
+		m_histtope_MET->Fill(met->met()/1000., m_weight);
+
+		for(unsigned int i(0);i < fatsigJets.size();i++){
+		m_histtope_mfjet->Fill(fatsigJets.at(i)->m()/1000., m_weight);
+		m_histtope_ptfjet->Fill(fatsigJets.at(i)->pt()/1000., m_weight);
+		m_histtope_etafjet->Fill(fabs(fatsigJets.at(i)->eta()), m_weight);		
+		}  
 	}    
+	if(oneMuon){
+		m_histtopmu_dPhiMETj->Fill(minPhiZv, m_weight);    //?
+		m_histtopmu_MET->Fill(met->met()/1000., m_weight);
+
+		for(unsigned int i(0);i < fatsigJets.size();i++){
+		m_histtopmu_mfjet->Fill(fatsigJets.at(i)->m()/1000., m_weight);
+		m_histtopmu_ptfjet->Fill(fatsigJets.at(i)->pt()/1000., m_weight);
+		m_histtopmu_etafjet->Fill(fabs(fatsigJets.at(i)->eta()), m_weight);		
+		}  
+	}    	
+	
   }
   
   //QCD CR
   bool pass_QCDCR = false;
   bool pass_minPhi = false;
-  if(minPhi < 0.4) pass_minPhi = true;
-  if( pass_noelectron && pass_nomuon && pass_fatjet && pass_200met && pass_minPhi) pass_QCDCR = true;
+  if(minPhiZv < 0.4) pass_minPhi = true;
+  if( pass_noelectron && pass_nomuon && pass_fatjet && pass_100met && pass_minPhi) pass_QCDCR = true;
 
   //Fill QCD hists
   if(pass_QCDCR){
-	m_histQCD_dPhiMETj->Fill(minPhi, m_weight);  
+	m_histQCD_dPhiMETj->Fill(minPhiZv, m_weight);  
+	m_histQCD_MET->Fill(met->met()/1000., m_weight);
+	m_histQCD_nB->Fill(CRbJets.size(),m_weight);
 	for(unsigned int i(0);i < fatsigJets.size();i++){
 		m_histQCD_mfjet->Fill(fatsigJets.at(i)->m()/1000., m_weight);
 		m_histQCD_ptfjet->Fill(fatsigJets.at(i)->pt()/1000., m_weight);
+		m_histQCD_etafjet->Fill(fabs(fatsigJets.at(i)->eta()), m_weight);		
+
 	}   
   }
   
@@ -1774,12 +1998,10 @@ if(pass_presele)
   //one fatjet 
   if( pass_noelectron && pass_nomuon && pass_nophoton && pass_250met  && pass_jetveto && pass_metcut && pass_jetmass  && pass_phimetjet)
   {
-	m_hist_nminusone_nfjet->Fill(fatsigJets.size(), m_weight);
-	for(unsigned int iJet(0); iJet <fatsigJets.size();iJet++){
-		m_hist_nminusone_ptfjet->Fill(fatsigJets.at(iJet)->pt()/1000., m_weight);
-		m_hist_nminusone_mfjet->Fill(fatsigJets.at(iJet)->m()/1000., m_weight);
-		m_hist_nminusone_etafjet->Fill(fatsigJets.at(iJet)->eta(), m_weight);
-	}
+	m_hist_nminusone_nfjet->Fill(fatsigJets.size(), m_weight);	
+	m_hist_nminusone_ptfjet->Fill(fatsigJets.at(leadingfatjet)->pt()/1000., m_weight);
+	m_hist_nminusone_mfjet->Fill(fatsigJets.at(leadingfatjet)->m()/1000., m_weight);
+	m_hist_nminusone_etafjet->Fill(fatsigJets.at(leadingfatjet)->eta(), m_weight);	
   } 
   //jet veto
   if( pass_noelectron && pass_nomuon && pass_nophoton && pass_250met  && pass_fatjet && pass_metcut && pass_jetmass && pass_phimetjet)

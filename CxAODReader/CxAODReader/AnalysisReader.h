@@ -119,27 +119,60 @@ public:
   TH1F* m_hist_nminusone_ndRBfjet; //!
   //TH2D* m_hist_nminusone_PhiMETj; //!
   //CR
-  TH1F* m_histW_ptW; //!
-  TH1F* m_histW_MT; //!
-  TH1F* m_histW_mfjet; //!
-  TH1F* m_histW_ptfjet; //!
+  TH1F* m_histWe_ptW; //!
+  TH1F* m_histWe_MT; //!
+  TH1F* m_histWe_mfjet; //!
+  TH1F* m_histWe_ptfjet; //!
+  TH1F* m_histWe_etafjet; //!  
+  TH1F* m_histWe_nB; //!
+  TH1F* m_histWmu_ptW; //!
+  TH1F* m_histWmu_MT; //!
+  TH1F* m_histWmu_mfjet; //!
+  TH1F* m_histWmu_ptfjet; //!
+  TH1F* m_histWmu_etafjet; //!
+  TH1F* m_histWmu_nB; //!
   
-  TH1F* m_histZl_ptZ; //!
-  TH1F* m_histZl_ptMETZ; //!
-  TH1F* m_histZl_mfjet; //!
-  TH1F* m_histZl_ptfjet; //!
+  TH1F* m_histZle_ptZ; //!
+  TH1F* m_histZle_ptMETZ; //!
+  TH1F* m_histZle_mfjet; //!
+  TH1F* m_histZle_ptfjet; //!
+  TH1F* m_histZle_etafjet; //!
+  TH1F* m_histZle_nB; //!
+  TH1F* m_histZle_mll; //!  
+  TH1F* m_histZlmu_ptZ; //!
+  TH1F* m_histZlmu_ptMETZ; //!
+  TH1F* m_histZlmu_mfjet; //!
+  TH1F* m_histZlmu_ptfjet; //!
+  TH1F* m_histZlmu_etafjet; //!
+  TH1F* m_histZlmu_nB; //!
+  TH1F* m_histZlmu_mll; //!  
   
   TH1F* m_histZv_ptfjet; //!
   TH1F* m_histZv_mfjet; //!
-
-  TH1F* m_histtop_dPhiMETj; //!
-  TH1F* m_histtop_ptfjet; //!
-  TH1F* m_histtop_mfjet; //! 
+  TH1F* m_histZv_etafjet; //!
+  TH1F* m_histZv_MET; //!
+  TH1F* m_histZv_nB; //!
+  
+  TH1F* m_histtope_dPhiMETj; //!
+  TH1F* m_histtope_ptfjet; //!
+  TH1F* m_histtope_mfjet; //! 
+  TH1F* m_histtope_etafjet; //!  
+  TH1F* m_histtope_MET; //!  
+  TH1F* m_histtope_nB; //! 
+  TH1F* m_histtopmu_dPhiMETj; //!
+  TH1F* m_histtopmu_ptfjet; //!
+  TH1F* m_histtopmu_mfjet; //! 
+  TH1F* m_histtopmu_etafjet; //!  
+  TH1F* m_histtopmu_MET; //!  
+  TH1F* m_histtopmu_nB; //! 
   
   TH1F* m_histQCD_dPhiMETj; //!
   TH1F* m_histQCD_ptfjet; //!
   TH1F* m_histQCD_mfjet; //! 
-  
+  TH1F* m_histQCD_etafjet; //! 
+  TH1F* m_histQCD_MET; //! 
+  TH1F* m_histQCD_nB; //!  
+   
   // 0 lep hists
   TH1F* m_hist2j_0lep_dRBB; //!
   TH1F* m_hist2j_0lep_dEtaBB; //!
