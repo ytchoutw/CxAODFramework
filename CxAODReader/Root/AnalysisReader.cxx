@@ -29,7 +29,9 @@ m_analysisType(-1),
     m_sumOfWeights(1.),
     m_isSherpaVJets(0),
     m_isSherpaPt0VJets(0),
-    m_SherpaPt0VJetsCut(70000)
+    m_SherpaPt0VJetsCut(70000),
+	m_isZnunu(0),
+	m_isZll(0)
 {
   // Here you put any code for the base initialization of variables,
   // e.g. initialize all pointers to 0.  Note that you should only put
@@ -367,9 +369,21 @@ EL::StatusCode AnalysisReader :: histInitialize_monoWZH()
   m_hist_mono_pre_jetpt = new TH1F(TString(buffer),TString(buffer),nbins, min, max);
   wk()->addOutput(m_hist_mono_pre_jetpt);
   
-    buffer = "Pre-selection jet Eta"; nbins = 10; min = -1.; max = 1. ;
+  buffer = "Pre-selection jet Eta"; nbins = 10; min = -1.; max = 1. ;
   m_hist_mono_pre_jeteta = new TH1F(TString(buffer),TString(buffer),nbins, min, max);
   wk()->addOutput(m_hist_mono_pre_jeteta);
+  
+  buffer = "Pre-selection C2"; nbins = 25; min = 0; max = 1 ;
+  m_hist_mono_pre_c2 = new TH1F(TString(buffer),"Pre-selection C2;C2;Normalized Events",nbins, min, max);
+  wk()->addOutput(m_hist_mono_pre_c2); 
+  
+  buffer = "Pre-selection D2"; nbins = 40; min = 0; max = 10 ;
+  m_hist_mono_pre_d2 = new TH1F(TString(buffer),"Pre-selection D2;D2;Normalized Events",nbins, min, max);
+  wk()->addOutput(m_hist_mono_pre_d2); 
+  
+  buffer = "Pre-selection #tau_{21}"; nbins = 40; min = 0; max = 2 ;
+  m_hist_mono_pre_tau12 = new TH1F(TString(buffer),"Pre-selection #tau_{21};#tau_{21};Normalized Events",nbins, min, max);
+  wk()->addOutput(m_hist_mono_pre_tau12);  
   
   
   //cutflow
@@ -412,6 +426,18 @@ EL::StatusCode AnalysisReader :: histInitialize_monoWZH()
   m_hist_mono_cutflow_fjetaddjetDeltaR = new TH1F(TString(buffer),TString(buffer),nbins, min, max);
   wk()->addOutput(m_hist_mono_cutflow_fjetaddjetDeltaR);
   
+  buffer = "MonoWZ SR: C2"; nbins = 25; min = 0; max = 1 ;
+  m_hist_mono_cutflow_c2 = new TH1F(TString(buffer),"MonoWZ SR: C2;C2;Normalized Events ",nbins, min, max);
+  wk()->addOutput(m_hist_mono_cutflow_c2); 
+  
+  buffer = "MonoWZ SR: D2"; nbins = 40; min = 0; max = 10 ;
+  m_hist_mono_cutflow_d2 = new TH1F(TString(buffer),"MonoWZ SR: D2;D2;Normalized Events",nbins, min, max);
+  wk()->addOutput(m_hist_mono_cutflow_d2); 
+  
+  buffer = "MonoWZ SR: #tau_{21}"; nbins = 40; min = 0; max = 2 ;
+  m_hist_mono_cutflow_tau12 = new TH1F(TString(buffer),"MonoWZ SR: #tau_{21};#tau_{21};Normalized Events",nbins, min, max);
+  wk()->addOutput(m_hist_mono_cutflow_tau12);  
+  
   
   //n-1 histogram 
   buffer = "AKt10Trimmed jet Multiplicity onefatjet n-1"; nbins = 6; min = -0.5; max = 5.5 ;
@@ -422,12 +448,12 @@ EL::StatusCode AnalysisReader :: histInitialize_monoWZH()
   m_hist_nminusone_ptfjet = new TH1F(TString(buffer),"p_{T,fatjet} onefatjet n-1;p_{T, fatjet} [GeV]; Normalized Events / 25 GeV",nbins, min, max);
   wk()->addOutput(m_hist_nminusone_ptfjet);
   
-  buffer = "Mass_{fatjet} onefatjet n-1"; nbins = 10; min = 0. ;max = 250 ;
-  m_hist_nminusone_mfjet = new TH1F(TString(buffer),"Mass_{fatjet} onefatjet n-1;Mass_{fatjet} [GeV]; Normalized Events / 25 GeV",nbins, min, max);
+  buffer = "Mass_{fatjet} onefatjet n-1"; nbins = 20; min = 50. ;max = 150 ;
+  m_hist_nminusone_mfjet = new TH1F(TString(buffer),"Mass_{fatjet} onefatjet n-1;Mass_{fatjet} [GeV]; Normalized Events / 5 GeV",nbins, min, max);
   wk()->addOutput(m_hist_nminusone_mfjet);
   
-  buffer = "#eta_{fatjet} onefatjet n-1"; nbins = 10; min = -4.5 ;max = 4.5 ;
-  m_hist_nminusone_etafjet = new TH1F(TString(buffer),"#eta_{fatjet} onefatjet n-1;#eta_{fatjet}; Normalized Events / 0.9 ",nbins, min, max);
+  buffer = "#eta_{fatjet} onefatjet n-1"; nbins = 20; min = -2.5 ;max = 2.5 ;
+  m_hist_nminusone_etafjet = new TH1F(TString(buffer),"#eta_{fatjet} onefatjet n-1;#eta_{fatjet}; Normalized Events / 0.25 ",nbins, min, max);
   wk()->addOutput(m_hist_nminusone_etafjet);
   
   buffer = "addjetveto n-1 sig addjet Multiplicity"; nbins = 10; min = -0.5; max = 9.5 ;
@@ -503,8 +529,8 @@ EL::StatusCode AnalysisReader :: histInitialize_monoWZH()
   m_histZle_ptZ = new TH1F(TString(buffer),"Zll CR e: p_{T,Z} ; p_{T,Z} [GeV]; Normalized Events / 20 GeV",nbins, min, max);
   wk()->addOutput(m_histZle_ptZ);      
   
-  buffer = "Zll CR e:  Mass_{fatjet}"; nbins = 25; min = 0.; max = 250. ;
-  m_histZle_mfjet = new TH1F(TString(buffer),"Zll CR e: Mass_{fatjet} ; Mass_{fatjet} [GeV]; Normalized Events / 10 GeV",nbins, min, max);
+  buffer = "Zll CR e:  Mass_{fatjet}"; nbins = 30; min = 50.; max = 200. ;
+  m_histZle_mfjet = new TH1F(TString(buffer),"Zll CR e: Mass_{fatjet} ; Mass_{fatjet} [GeV]; Normalized Events / 5 GeV",nbins, min, max);
   wk()->addOutput(m_histZle_mfjet);     	
   
   buffer = "Zll CR e: p_{T,fatjet} fatjet "; nbins = 20; min = 250. ;max = 750 ;
@@ -528,8 +554,8 @@ EL::StatusCode AnalysisReader :: histInitialize_monoWZH()
   m_histZlmu_ptZ = new TH1F(TString(buffer),"Zll CR #mu: p_{T,Z} ; p_{T,Z} [GeV]; Normalized Events / 20 GeV",nbins, min, max);
   wk()->addOutput(m_histZlmu_ptZ);      
   
-  buffer = "Zll CR #mu:  Mass_{fatjet}"; nbins = 25; min = 0.; max = 250. ;
-  m_histZlmu_mfjet = new TH1F(TString(buffer),"Zll CR #mu: Mass_{fatjet} ; Mass_{fatjet} [GeV]; Normalized Events / 10 GeV",nbins, min, max);
+  buffer = "Zll CR #mu:  Mass_{fatjet}"; nbins = 30; min = 50.; max = 200. ;
+  m_histZlmu_mfjet = new TH1F(TString(buffer),"Zll CR #mu: Mass_{fatjet} ; Mass_{fatjet} [GeV]; Normalized Events / 5 GeV",nbins, min, max);
   wk()->addOutput(m_histZlmu_mfjet);     	
   
   buffer = "Zll CR #mu: p_{T,fatjet} fatjet "; nbins = 20; min = 250. ;max = 750 ;
@@ -636,14 +662,36 @@ EL::StatusCode AnalysisReader :: histInitialize_monoWZH()
   m_histQCD_etafjet = new TH1F(TString(buffer),"QCD CR: #eta_{fatjet};#eta_{fatjet}; Normalized Events / 0.05 ",nbins, min, max);
   wk()->addOutput(m_histQCD_etafjet);    
   
-  buffer = "QCD CR: E_{T}^{Miss}"; nbins = 20; min = 200.; max = 1200. ;
+  buffer = "QCD CR: E_{T}^{Miss}"; nbins = 22; min = 100.; max = 1200. ;
   m_histQCD_MET = new TH1F(TString(buffer),"QCD CR: E_{T}^{Miss}; E_{T}^{Miss} [GeV]; Normalized Events / 50 GeV",nbins, min, max);
   wk()->addOutput(m_histQCD_MET);    
   
   buffer = "QCD CR: AKt4 b-jet Multiplicity"; nbins = 6; min = -0.5; max = 5.5 ;
   m_histQCD_nB = new TH1F(TString(buffer),"QCD CR: AKt4 b-jet Multiplicity; Multiplicity_{AKt4 b-jet}; Normalized Events",nbins, min, max);
   wk()->addOutput(m_histQCD_nB);    
+  //TF
+  buffer = "Curve1: #slash{E}_{T}"; nbins = 50; min = 200.; max = 1200. ;
+  m_hist_TF1 = new TH1F(TString(buffer),"Curve1: #slash{E}_{T}; #slash{E}_{T} [GeV]; Normalized Events / 20 GeV",nbins, min, max);
+  wk()->addOutput(m_hist_TF1);    
   
+  buffer = "Curve2: #slash{E}_{T}"; nbins = 50; min = 200.; max = 1200. ;
+  m_hist_TF2 = new TH1F(TString(buffer),"Curve2: #slash{E}_{T}; #slash{E}_{T} [GeV]; Normalized Events / 20 GeV",nbins, min, max);
+  wk()->addOutput(m_hist_TF2);  
+  
+  buffer = "Curve3: #slash{E}_{T}"; nbins = 50; min = 200.; max = 1200. ;
+  m_hist_TF3 = new TH1F(TString(buffer),"Curve3: #slash{E}_{T}; #slash{E}_{T} [GeV]; Normalized Events / 20 GeV",nbins, min, max);
+  wk()->addOutput(m_hist_TF3);
+  
+  buffer = "Curve4: #slash{E}_{T}"; nbins = 50; min = 200.; max = 1200. ;
+  m_hist_TF4 = new TH1F(TString(buffer),"Curve4: #slash{E}_{T}; #slash{E}_{T} [GeV]; Normalized Events / 20 GeV",nbins, min, max);
+  wk()->addOutput(m_hist_TF4);    
+  buffer = "Curve5: #slash{E}_{T}"; nbins = 50; min = 200.; max = 1200. ;
+  m_hist_TF5 = new TH1F(TString(buffer),"Curve5: #slash{E}_{T}; #slash{E}_{T} [GeV]; Normalized Events / 20 GeV",nbins, min, max);
+  wk()->addOutput(m_hist_TF5);    
+  buffer = "Curve6: #slash{E}_{T}"; nbins = 50; min = 200.; max = 1200. ;
+  m_hist_TF6 = new TH1F(TString(buffer),"Curve6: #slash{E}_{T}; #slash{E}_{T} [GeV]; Normalized Events / 20 GeV",nbins, min, max);
+  wk()->addOutput(m_hist_TF6);    
+
   
   return EL::StatusCode::SUCCESS;
 }
@@ -673,6 +721,8 @@ EL::StatusCode AnalysisReader :: fileExecute ()
 
   // general Sherpa flag
   m_isSherpaVJets = (filename.Contains("Sherpa")) ? true : false;
+  m_isZnunu = (filename.Contains("Sherpa_CT10_ZnunuMassive")) ? true : false;
+  if(filename.Contains("Sherpa_CT10_ZeeMassive") || filename.Contains("Sherpa_CT10_ZmumuMassive") || filename.Contains("Sherpa_CT10_ZtautauMassive")) m_isZll = true; 
   
 
   return EL::StatusCode::SUCCESS;
@@ -1389,22 +1439,9 @@ EL::StatusCode AnalysisReader :: fill_monoWZH()
   //Event Selection
   //-------------------------
 
- 
-  //Need to def new selection
-  /*bool passmonoWZH=m_zerolepSel->passSelection(eventInfo,
-                                            met,
-                                            elecs,
-											phots,
-                                            muons,
-                                            jets);
-  */
-  //  if(debug)  std::cout << " Passed 0 lepton "  << pass0lep << std::endl;
-  //Following code need to be check
-  ResultVHbb0lep zerolepResult=m_zerolepSel->result();
-    
 
   // select events
-  //if (!passmonoWZH) return EL::StatusCode::SUCCESS;
+
   std::vector<const xAOD::Jet*> selJets;
   
   for(unsigned int iJet(0); iJet < jets->size();iJet++){
@@ -1412,16 +1449,9 @@ EL::StatusCode AnalysisReader :: fill_monoWZH()
 	selJets.push_back(Jet);
   }
   
-  
-  //pre-selection 
-  //could be implement in CxAODMaker  
+  //dummy variable 
   bool pass_presele = true;
-  //if(METNominal->size() == 0) pass_presele = false;
-  //MET > 200GeV
-  //if((met->met()/1000.) < 200 ) pass_presele = false;
-  //a least one fatjet 
-  //if(fatjets->size() < 1) pass_presele = false;
- 
+  
   
   //Event selection
   bool pass_250met = false;
@@ -1438,6 +1468,7 @@ EL::StatusCode AnalysisReader :: fill_monoWZH()
   bool pass_mFJetcut = false;
   bool pass_1subJet = false;
   bool pass_2subJet = false;
+  bool pass_1subB = false;
   bool pass_2subB = false;
   
   m_hist_mono_cutflow->Fill(m_hist_mono_cutflow->GetXaxis()->FindBin("All"), m_weight);
@@ -1561,9 +1592,38 @@ if(pass_presele)
 	if(!(m_superDecorator.get(Jet, JetFloatProps::MV1) > 0.971966))  continue; // 70% operation point 
 	subBJets.push_back(Jet);
   }
-
+  
+  
+  
   
 
+  //TF variables
+  
+  TVector2 metVec2;
+  //if(m_isZnunu) 
+  metVec2.Set(met->mpx(), met->mpy());
+  if(m_isZll && selMuons.size() == 2) {
+	TVector2 mu_0, mu_1;
+	mu_0.SetMagPhi(selMuons.at(0)->pt(),selMuons.at(0)->phi());
+	mu_1.SetMagPhi(selMuons.at(1)->pt(),selMuons.at(1)->phi());
+	metVec2 -= mu_0;
+	metVec2 -= mu_1;
+  }
+    
+  
+  bool pass_TFMET = false;
+  bool pass_TFmuveto = false;
+  bool pass_TFminiPhi = false;
+  double TFminPhi = 1;
+  if(metVec2.Mod()/1000. > 250 ) pass_TFMET = true;
+  if(m_isZnunu && selMuons.size() == 0)   pass_TFmuveto = true;
+  if(m_isZll && selMuons.size() == 2) pass_TFmuveto = true;
+  for(unsigned int j(0);j < metJets.size();j++){
+	TVector2 jetvec;
+	jetvec.SetMagPhi(metJets.at(j)->pt(), metJets.at(j)->phi());
+	if(fabs(jetvec.DeltaPhi(metVec2)) < TFminPhi) TFminPhi = fabs(jetvec.DeltaPhi(metVec2));
+  }
+  if(TFminPhi > 0.4) pass_TFminiPhi = true;
   
   //SR
   //met > 250 GeV
@@ -1599,12 +1659,34 @@ if(pass_presele)
 	//n(subjet)>0 & >1
 	if(subJets.size() > 0) pass_1subJet = true;
 	if(subJets.size() > 1) pass_2subJet = true;
-	//n(sub Bjet) ==2
+	//n(sub Bjet) =1/=2
+	if(subBJets.size() == 1) pass_1subB = true;
 	if(subBJets.size() == 2) pass_2subB = true;
+	
 	
   }
   
   
+  //Fill TF function #slash{E}_{T} 
+  if(pass_TFMET && pass_noelectron && pass_TFmuveto && pass_fatjet && pass_jetveto)  {
+	m_hist_TF1->Fill(metVec2.Mod()/1000.,m_weight);   
+  }
+  if(pass_TFMET && pass_noelectron && pass_TFmuveto && pass_fatjet && pass_TFminiPhi)  {
+	m_hist_TF2->Fill(metVec2.Mod()/1000.,m_weight) ;  
+  }
+  if(pass_TFMET && pass_noelectron && pass_TFmuveto && pass_fatjet && pass_jetmass)  {
+	m_hist_TF3->Fill(metVec2.Mod()/1000.,m_weight) ;   
+  }
+  if(pass_TFMET && pass_noelectron && pass_TFmuveto && pass_fatjet && pass_mFJetcut)  {
+	m_hist_TF4->Fill(metVec2.Mod()/1000.,m_weight) ; 
+  }
+  if(pass_TFMET && pass_noelectron && pass_TFmuveto && pass_fatjet && pass_1subB)  {
+	m_hist_TF5->Fill(metVec2.Mod()/1000.,m_weight) ; 
+  }
+  if(pass_TFMET && pass_noelectron && pass_TFmuveto && pass_fatjet && pass_2subB)  {
+	m_hist_TF6->Fill(metVec2.Mod()/1000.,m_weight) ; 
+  }  
+	  
   
 
 
@@ -1960,12 +2042,25 @@ if(pass_presele)
 	m_hist_mono_cutflow_met_MET->Fill(met->met()/1000., m_weight);
 	m_hist_mono_cutflow->Fill(m_hist_mono_cutflow->GetXaxis()->FindBin("500met"), m_weight);
 	m_hist_mono_cutflow_noweight->Fill(m_hist_mono_cutflow_noweight->GetXaxis()->FindBin("500met"));
+	for(unsigned int iJet(0); iJet < fatsigJets.size();iJet++){
+	const xAOD::Jet* Jet = fatsigJets.at(iJet);  
+	m_hist_mono_pre_tau12->Fill(m_superDecorator.get(Jet, FatJetFloatProps::Tau21), m_weight);
+	m_hist_mono_pre_d2->Fill(m_superDecorator.get(Jet, FatJetFloatProps::D2), m_weight);
+	m_hist_mono_pre_c2->Fill(m_superDecorator.get(Jet, FatJetFloatProps::C2), m_weight);	
+	}
   }
   if(pass_250met  && pass_fatjet &&  pass_noelectron && pass_nomuon && pass_nophoton && pass_jetveto && pass_phimetjet && pass_metcut && pass_jetmass)
   { 
 	m_hist_mono_cutflow_mj_MET->Fill(met->met()/1000., m_weight);
 	m_hist_mono_cutflow->Fill(m_hist_mono_cutflow->GetXaxis()->FindBin("mJ_{W/Z}"), m_weight);
 	m_hist_mono_cutflow_noweight->Fill(m_hist_mono_cutflow_noweight->GetXaxis()->FindBin("mJ_{W/Z}"));
+	for(unsigned int iJet(0); iJet < fatsigJets.size();iJet++){
+		const xAOD::Jet* Jet = fatsigJets.at(iJet);  
+		m_hist_mono_cutflow_tau12->Fill(m_superDecorator.get(Jet, FatJetFloatProps::Tau21), m_weight);
+		m_hist_mono_cutflow_d2->Fill(m_superDecorator.get(Jet, FatJetFloatProps::D2), m_weight);
+		m_hist_mono_cutflow_c2->Fill(m_superDecorator.get(Jet, FatJetFloatProps::C2), m_weight);	
+	}
+	
   }
   
   bool pass_pre_select = false;   //shorthand flag 

@@ -84,6 +84,8 @@ public:
   bool m_isSherpaVJets; // is Sherpa file
   bool m_isSherpaPt0VJets; //! is present sample SherpaVJets Pt0
   float m_SherpaPt0VJetsCut; //! cut Pt0 events overlapping with other PtV slices
+  bool m_isZnunu; //!
+  bool m_isZll; //!
   
   
   //monoWZH hists
@@ -97,6 +99,9 @@ public:
   TH1F* m_hist_mono_pre_jetm; //!
   TH1F* m_hist_mono_pre_jetpt; //!
   TH1F* m_hist_mono_pre_jeteta; //!
+  TH1F* m_hist_mono_pre_d2;  //!
+  TH1F* m_hist_mono_pre_c2; //!
+  TH1F* m_hist_mono_pre_tau12;  //!  
   //cutflow
   TH1D* m_hist_mono_cutflow; //!
   TH1D* m_hist_mono_cutflow_noweight; //!
@@ -106,6 +111,10 @@ public:
   TH1F* m_hist_mono_cutflow_mj_MET; //!
   TH1F* m_hist_mono_cutflow_Nsigfjet; //!
   TH1F* m_hist_mono_cutflow_fjetaddjetDeltaR; //!
+  TH1F* m_hist_mono_cutflow_d2; //!
+  TH1F* m_hist_mono_cutflow_c2;  //!
+  TH1F* m_hist_mono_cutflow_tau12;  //! 
+  
   //monoWZH n-1
   TH1F* m_hist_nminusone_nfjet; //!
   TH1F* m_hist_nminusone_ptfjet; //!
@@ -118,6 +127,13 @@ public:
   TH1F* m_hist_nminusone_ndRjfjet; //!
   TH1F* m_hist_nminusone_ndRBfjet; //!
   //TH2D* m_hist_nminusone_PhiMETj; //!
+  //Transfer function
+  TH1F* m_hist_TF1;   //!
+  TH1F* m_hist_TF2; //!
+  TH1F* m_hist_TF3; //!
+  TH1F* m_hist_TF4;  //!
+  TH1F* m_hist_TF5; //!
+  TH1F* m_hist_TF6; //!
   //CR
   TH1F* m_histWe_ptW; //!
   TH1F* m_histWe_MT; //!
