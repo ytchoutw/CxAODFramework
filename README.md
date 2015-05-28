@@ -25,7 +25,7 @@ Location of your CxAOD dataset.It should have the structure like .../$YOURDATASE
     rc compile
 
 ##Run Analysis
-    hsg5frameworkReadCxAOD output_dir
+    source run_allsample.sh
 
 ##Useful Links
 ###CxAODFrameWork  <br/>
