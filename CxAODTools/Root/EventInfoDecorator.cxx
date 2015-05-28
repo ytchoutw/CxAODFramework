@@ -23,7 +23,7 @@ EventInfoDecorator::EventInfoDecorator() {
 
   m_floatPropNames = {
     {EventInfoFloatProps::MCEventWeight, "MCEventWeight"},
-    {EventInfoFloatProps::ZPV, "zPV"}
+    {EventInfoFloatProps::ZPV, "ZPV"}
   };
 }
 

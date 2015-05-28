@@ -86,10 +86,12 @@ public:
   float m_SherpaPt0VJetsCut; //! cut Pt0 events overlapping with other PtV slices
   bool m_isZnunu; //!
   bool m_isZll; //!
+  bool m_isWmunu; //!
   
   
   //monoWZH hists
   //pre-selection
+  TH1F* m_hist_check_MET; //!
   TH1F* m_hist_mono_pre_MET; //!
   TH1F* m_hist_mono_pre_METPhi; //!
   TH1F* m_hist_mono_pre_Nfatjet; //!
@@ -102,9 +104,12 @@ public:
   TH1F* m_hist_mono_pre_d2;  //!
   TH1F* m_hist_mono_pre_c2; //!
   TH1F* m_hist_mono_pre_tau12;  //!  
+  TH1F* m_hist_pre_nB;  //!   
   //cutflow
   TH1D* m_hist_mono_cutflow; //!
+  TH1D* m_hist_CR_cutflow; //!
   TH1D* m_hist_mono_cutflow_noweight; //!
+  TH1D* m_hist_CR_cutflow_noweight; //!
   TH1F* m_hist_mono_cutflow_fjet_MET; //!
   TH1F* m_hist_mono_cutflow_jetveto_MET; //!
   TH1F* m_hist_mono_cutflow_met_MET; //!
@@ -120,13 +125,15 @@ public:
   TH1F* m_hist_nminusone_ptfjet; //!
   TH1F* m_hist_nminusone_mfjet; //!
   TH1F* m_hist_nminusone_etafjet; //!
-  TH1F* m_hist_nminusone_jetveto; //!
+  TH1F* m_hist_nm_naddj; //!
   TH1F* m_hist_nminusone_met; //!
-  TH1F* m_hist_nminusone_mj; //!
+  TH1F* m_hist_nminusone_mfj; //!
+  TH1F* m_hist_nm_maddj; //!
+  TH1F* m_hist_nm_ptaddj; //!
   TH1F* m_hist_nminusone_phi; //!
-  TH1F* m_hist_nminusone_ndRjfjet; //!
-  TH1F* m_hist_nminusone_ndRBfjet; //!
+  TH1F* m_hist_nm_D2; //!
   //TH2D* m_hist_nminusone_PhiMETj; //!
+  
   //Transfer function
   TH1F* m_hist_TF1;   //!
   TH1F* m_hist_TF2; //!
@@ -134,6 +141,13 @@ public:
   TH1F* m_hist_TF4;  //!
   TH1F* m_hist_TF5; //!
   TH1F* m_hist_TF6; //!
+  
+  TH1F* m_hist_Wjet_TF1; //!
+  TH1F* m_hist_Wjet_TF2; //!
+  TH1F* m_hist_Wjet_TF3; //!
+  TH1F* m_hist_Wjet_TF4; //!
+  TH1F* m_hist_Wjet_TF5; //!
+  TH1F* m_hist_Wjet_TF6; //!
   //CR
   TH1F* m_histWe_ptW; //!
   TH1F* m_histWe_MT; //!
@@ -175,13 +189,78 @@ public:
   TH1F* m_histtope_etafjet; //!  
   TH1F* m_histtope_MET; //!  
   TH1F* m_histtope_nB; //! 
+  TH1F* m_histtope_nfjet; //! 
   TH1F* m_histtopmu_dPhiMETj; //!
   TH1F* m_histtopmu_ptfjet; //!
   TH1F* m_histtopmu_mfjet; //! 
   TH1F* m_histtopmu_etafjet; //!  
   TH1F* m_histtopmu_MET; //!  
-  TH1F* m_histtopmu_nB; //! 
+  TH1F* m_histtopmu_nB; //!
+  TH1F* m_histtopmu_nfjet; //!  
   
+  TH1F* m_histtope_nm_lep_nB;  //!
+  TH1F* m_histtope_nm_fj_nB;  //!
+  TH1F* m_histtope_nm_dR_nB;  //!
+  TH1F* m_histtopmu_nm_lep_nB;  //!
+  TH1F* m_histtopmu_nm_fj_nB;  //!
+  TH1F* m_histtopmu_nm_dR_nB; //!
+  TH1F* m_histtope_nm_lep_mfj;  //!
+  TH1F* m_histtope_nm_fj_mfj;  //!
+  TH1F* m_histtope_nm_dR_mfj;  //!
+  TH1F* m_histtopmu_nm_lep_mfj;  //!
+  TH1F* m_histtopmu_nm_fj_mfj;  //!
+  TH1F* m_histtopmu_nm_dR_mfj; //!
+  TH1F* m_histtope_nm_nB_mfj;  //!
+  TH1F* m_histtopmu_nm_nB_mfj;  //!
+  
+  TH1F* m_histtope_nm_lep_nfj;  //!
+  TH1F* m_histtope_nm_fj_nfj;  //!
+  TH1F* m_histtope_nm_dR_nfj;  //!
+  TH1F* m_histtope_nm_nB_nfj;  //!  
+  TH1F* m_histtopmu_nm_lep_nfj;  //!
+  TH1F* m_histtopmu_nm_fj_nfj;  //!
+  TH1F* m_histtopmu_nm_dR_nfj; //!
+  TH1F* m_histtopmu_nm_nB_nfj;  //!  
+ 
+  TH1F* m_histtope_cut_lep_mfj;  //!
+  TH1F* m_histtope_cut_fj_mfj;  //!
+  TH1F* m_histtope_cut_nB_mfj;  //!
+  TH1F* m_histtope_cut_dR_mfj; //!
+  TH1F* m_histtopmu_cut_lep_mfj;  //!
+  TH1F* m_histtopmu_cut_fj_mfj;  //!
+  TH1F* m_histtopmu_cut_nB_mfj;  //!
+  TH1F* m_histtopmu_cut_dR_mfj; //!
+  //truth level
+  TH1F* m_histtope_truth_dR_BW; //! 
+  TH1F* m_histtope_truth_dR_BW_lowpt; //!
+  TH1F* m_histtope_truth_dR_BW_highpt; //!   
+  TH1F* m_histtope_truth_pt_t; //!  
+  TH1F* m_histtope_truth_nB;  //! 
+  TH1F* m_histtope_truth_nW;  //! 
+  TH1F* m_histtope_truth_nt;  //!  
+  
+  //pt split
+  TH1F* m_histtop_split_low_mfj;  //!  
+  TH1F* m_histtop_split_high_mfj;  //!    
+  TH1F* m_histtope_split_low_mfj;  //!  
+  TH1F* m_histtope_split_high_mfj;  //!    
+  TH1F* m_histtopmu_split_low_mfj;  //!  
+  TH1F* m_histtopmu_split_high_mfj;  //!      
+  TH1F* m_histtope_split_250_mfj;  //!  
+  TH1F* m_histtope_split_500_mfj;  //!  
+  TH1F* m_histtope_split_1000_mfj;  //!    
+  TH1F* m_histtopmu_split_250_mfj;  //!  
+  TH1F* m_histtopmu_split_500_mfj;  //!  
+  TH1F* m_histtopmu_split_1000_mfj;  //!    
+  
+  TH1F* m_histtopmu_truth_dR_BW; //! 
+  TH1F* m_histtopmu_truth_dR_BW_lowpt; //!
+  TH1F* m_histtopmu_truth_dR_BW_highpt; //!   
+  TH1F* m_histtopmu_truth_pt_t; //!  
+  TH1F* m_histtopmu_truth_nB;  //! 
+  TH1F* m_histtopmu_truth_nW;  //! 
+  TH1F* m_histtopmu_truth_nt;  //!  
+ 
   TH1F* m_histQCD_dPhiMETj; //!
   TH1F* m_histQCD_ptfjet; //!
   TH1F* m_histQCD_mfjet; //! 

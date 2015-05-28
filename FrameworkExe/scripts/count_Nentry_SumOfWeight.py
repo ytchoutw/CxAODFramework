@@ -6,25 +6,25 @@ ROOT.gROOT.SetBatch(True)
 ana = "0lep"
 
 nrj = [
-#"8TeV",
+"8TeV",
 "13TeV",
 ]
 
 #user = "user.djamin"
-user = "user.arturos"
+user = "group.phys-higgs"
 
 ini_count = 0
 
 count_8 = [
-#["167740",ini_count,ini_count], 
-#["167741",ini_count,ini_count],
-#["167742",ini_count,ini_count],
-#["167743",ini_count,ini_count],
-#["167744",ini_count,ini_count],
-#["167745",ini_count,ini_count],
-#["167746",ini_count,ini_count],
-#["167747",ini_count,ini_count],
-#["167748",ini_count,ini_count],
+["167740",ini_count,ini_count], 
+["167741",ini_count,ini_count],
+["167742",ini_count,ini_count],
+["167743",ini_count,ini_count],
+["167744",ini_count,ini_count],
+["167745",ini_count,ini_count],
+["167746",ini_count,ini_count],
+["167747",ini_count,ini_count],
+["167748",ini_count,ini_count],
 #["167749",ini_count,ini_count],
 #["167750",ini_count,ini_count],
 #["167751",ini_count,ini_count],
@@ -34,31 +34,19 @@ count_8 = [
 #["167755",ini_count,ini_count],
 #["167756",ini_count,ini_count],
 #["167757",ini_count,ini_count],
-#["167758",ini_count,ini_count],
-#["167759",ini_count,ini_count],
-#["167760",ini_count,ini_count],
-#["167806",ini_count,ini_count],
-#["167807",ini_count,ini_count],
-#["167808",ini_count,ini_count],
-#["167818",ini_count,ini_count],
-#["167819",ini_count,ini_count],
-#["167820",ini_count,ini_count],
-#["167830",ini_count,ini_count],
-#["167831",ini_count,ini_count],
-#["167832",ini_count,ini_count],
-#["167842",ini_count,ini_count],
-#["167843",ini_count,ini_count],
-#["167844",ini_count,ini_count],
+["167758",ini_count,ini_count],
+["167759",ini_count,ini_count],
+["167760",ini_count,ini_count],
 #["110119",ini_count,ini_count],
 #["110140",ini_count,ini_count],
 #["110101",ini_count,ini_count],
-#["117050",ini_count,ini_count],
+["117050",ini_count,ini_count],
 #["189340",ini_count,ini_count],
 #["189341",ini_count,ini_count],
 #["189342",ini_count,ini_count],
-#["189343",ini_count,ini_count],
-#["189344",ini_count,ini_count],
-#["189345",ini_count,ini_count],
+["189343",ini_count,ini_count],
+["189344",ini_count,ini_count],
+["189345",ini_count,ini_count],
 #["189420",ini_count,ini_count],
 #["189421",ini_count,ini_count],
 #["189422",ini_count,ini_count],
@@ -74,63 +62,6 @@ count_8 = [
 ]
 
 count_13 = [
-["191199",ini_count,ini_count],
-["191200",ini_count,ini_count],
-["191201",ini_count,ini_count],
-["191202",ini_count,ini_count],
-["191203",ini_count,ini_count],
-["191204",ini_count,ini_count],
-["191205",ini_count,ini_count],
-["191206",ini_count,ini_count],
-["191207",ini_count,ini_count],
-["191208",ini_count,ini_count],
-["191209",ini_count,ini_count],
-["191210",ini_count,ini_count],
-["191211",ini_count,ini_count],
-["191212",ini_count,ini_count],
-["191213",ini_count,ini_count],
-["191214",ini_count,ini_count],
-["191215",ini_count,ini_count],
-["191216",ini_count,ini_count],
-["191217",ini_count,ini_count],
-["191218",ini_count,ini_count],
-["191219",ini_count,ini_count],
-["191220",ini_count,ini_count],
-["191221",ini_count,ini_count],
-["191222",ini_count,ini_count],
-["191223",ini_count,ini_count],
-["191224",ini_count,ini_count],
-["191225",ini_count,ini_count],
-["191226",ini_count,ini_count],
-["191227",ini_count,ini_count],
-["191228",ini_count,ini_count],
-["191229",ini_count,ini_count],
-["191230",ini_count,ini_count],
-["191231",ini_count,ini_count],
-["191232",ini_count,ini_count],
-["191233",ini_count,ini_count],
-["191234",ini_count,ini_count],
-["191235",ini_count,ini_count],
-["191236",ini_count,ini_count],
-["191237",ini_count,ini_count],
-["191238",ini_count,ini_count],
-["191239",ini_count,ini_count],
-["191240",ini_count,ini_count],
-["191241",ini_count,ini_count],
-["191242",ini_count,ini_count],
-["191243",ini_count,ini_count],
-["191244",ini_count,ini_count],
-
-["203883",ini_count,ini_count],
-["203884",ini_count,ini_count],
-["203885",ini_count,ini_count],
-["203886",ini_count,ini_count],
-["203887",ini_count,ini_count],
-["203888",ini_count,ini_count],
-["203889",ini_count,ini_count],
-["203890",ini_count,ini_count],
-["203891",ini_count,ini_count],
-
 ["167740",ini_count,ini_count], 
 ["167741",ini_count,ini_count],
 ["167742",ini_count,ini_count],
@@ -253,30 +184,7 @@ count_13 = [
 ["110305",ini_count,ini_count],
 ["161805",ini_count,ini_count],
 ["161849",ini_count,ini_count],
-["161827",ini_count,ini_count],
-
-["129170",ini_count,ini_count],
-["129171",ini_count,ini_count],
-["129178",ini_count,ini_count],
-["129200",ini_count,ini_count],
-["129201",ini_count,ini_count],
-["129202",ini_count,ini_count],
-["129203",ini_count,ini_count],
-["129204",ini_count,ini_count],
-["129205",ini_count,ini_count],
-["129206",ini_count,ini_count],
-["129207",ini_count,ini_count],
-["129208",ini_count,ini_count],
-
-["147910",ini_count,ini_count],
-["147911",ini_count,ini_count],
-["147912",ini_count,ini_count],
-["147913",ini_count,ini_count],
-["147914",ini_count,ini_count],
-["147915",ini_count,ini_count],
-["147916",ini_count,ini_count],
-["147917",ini_count,ini_count],
-
+#["161827",ini_count,ini_count],
 ]
 
 # count
@@ -297,8 +205,7 @@ for subdir, dirs, files in os.walk(".") :
         if i_nrj == "13TeV" : count = count_13
         #
         if my_file.find(i_nrj) < 0 : continue
-        #if my_file.find("_outputLabel.root") < 0 : continue
-	if my_file.find("data_CxAOD.root") < 0 : continue
+        if my_file.find("_outputLabel.root") < 0 : continue
         for i_count in count :
           if my_file.find(i_count[0]) >= 0 :
             i_count[1] += n_entries
